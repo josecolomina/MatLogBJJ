@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Función helper para ver si está autenticado
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // 1. Usuarios: Cualquiera puede leer perfiles básicos, solo dueño edita
+    match /users/{userId} {
+      allow read: if isSignedIn(); 
+      allow write: if request.auth.uid == userId;
+      
+      // 2. Technical Logs (PRIVADO): Solo el dueño lee y escribe
+      match /technical_logs/{logId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+      
+      // 3. Rivals (PRIVADO): Solo el dueño lee y escribe
+      match /rivals/{rivalId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
+
+    // 4. Actividades (PÚBLICO): Feed social
+    match /activities/{activityId} {
+      allow read: if isSignedIn(); // Todo el mundo ve que entrenaste
+      allow create: if request.auth.uid == request.resource.data.user_id;
+      // Solo el dueño puede editar/borrar su actividad (ej: borrar un entreno erróneo)
+      allow update, delete: if request.auth.uid == resource.data.user_id;
+    }
+    
+    // 5. Academias (GLOBAL): Lectura pública
+    match /academies/{academyId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Solo admin (o cloud functions) crea academias por ahora
+    }
+  }
+}
