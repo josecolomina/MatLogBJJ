@@ -5,7 +5,7 @@ part 'rival.freezed.dart';
 part 'rival.g.dart';
 
 @freezed
-class Rival with _$Rival {
+abstract class Rival with _$Rival {
   const factory Rival({
     required String rivalUid,
     required String rivalName,

@@ -5,7 +5,7 @@ part 'technical_log.freezed.dart';
 part 'technical_log.g.dart';
 
 @freezed
-class TechnicalLog with _$TechnicalLog {
+abstract class TechnicalLog with _$TechnicalLog {
   const factory TechnicalLog({
     required String logId,
     required String activityRef,
@@ -21,7 +21,7 @@ class TechnicalLog with _$TechnicalLog {
 }
 
 @freezed
-class ProcessedTechnique with _$ProcessedTechnique {
+abstract class ProcessedTechnique with _$ProcessedTechnique {
   const factory ProcessedTechnique({
     required String techniqueName,
     required String category,

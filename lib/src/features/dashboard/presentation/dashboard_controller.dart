@@ -1,14 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 import '../../authentication/data/auth_repository.dart';
 
-class DashboardController extends StateNotifier<AsyncValue<void>> {
-  final Ref _ref;
-
-  DashboardController(this._ref) : super(const AsyncValue.data(null));
+class DashboardController extends AsyncNotifier<void> {
+  @override
+  FutureOr<void> build() {
+    return null;
+  }
 
   Future<void> checkWeeklyGoal() async {
-    final user = _ref.read(authRepositoryProvider).currentUser;
+    final user = ref.read(authRepositoryProvider).currentUser;
     if (user == null) return;
 
     final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
@@ -36,8 +38,8 @@ class DashboardController extends StateNotifier<AsyncValue<void>> {
   }
 }
 
-final dashboardControllerProvider = StateNotifierProvider<DashboardController, AsyncValue<void>>((ref) {
-  return DashboardController(ref);
+final dashboardControllerProvider = AsyncNotifierProvider<DashboardController, void>(() {
+  return DashboardController();
 });
 
 final userProfileProvider = StreamProvider<DocumentSnapshot>((ref) {

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../authentication/data/auth_repository.dart';
 import '../data/training_repository.dart';
-import '../../services/gemini_service.dart';
+import '../../../services/gemini_service.dart';
 import '../domain/activity.dart';
 import '../domain/technical_log.dart';
 
