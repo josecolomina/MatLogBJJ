@@ -1,6 +1,6 @@
 PRD Técnico: MatLog (MVP)
 
-Versión: 1.1
+Versión: 1.2
 Enfoque: Mobile-First, Offline-First, Zero-Cost Infrastructure.
 Stack: Flutter + Firebase (Spark) + Gemini 1.5 Flash.
 
@@ -95,7 +95,6 @@ E. academies (Global - Shared)
   "academy_id": "string",
   "name": "string",
   "address": "string"
-  // Coordenadas eliminadas del core, dirección es texto simple
 }
 
 
@@ -190,7 +189,7 @@ Busca/Crea documento en users/{me}/rivals/{friend}.
 
 Incrementa contador correspondiente (wins, losses, draws).
 
-Nota: Esto es privado por defecto (mi registro de mis combates), para evitar conflictos sociales ("¡Oye, yo no me rendí ahí!").
+Nota: Esto es privado por defecto, no se notifica al rival.
 
 Fase 4: Feed Social & Grafo
 
@@ -198,10 +197,76 @@ Feed: Muestra actividades de amigos.
 
 Grafo: Visualización local de técnicas aprendidas basada en technical_logs.
 
-4. Consideraciones de Coste y Límites (Plan Spark)
+4. Stack Tecnológico y Estándares (MANDATORIO)
 
-Reset Semanal: Al no tener Cloud Scheduler (Spark), el reset de la misión semanal se hace "Lazy" (Perezoso). Cuando el usuario abre la app, el cliente Flutter comprueba la fecha. Si es lunes de una nueva semana, resetea el contador local y manda el update a Firestore.
+La implementación debe seguir estrictamente estas directrices para evitar deuda técnica:
 
-Lecturas VS: La colección rivals se carga bajo demanda (solo al entrar al detalle de ese amigo), no se descarga con el perfil principal.
+4.1. Flutter Core
 
-Gemini: Mantener el prompt conciso para reducir tokens de entrada/salida.
+Gestión de Estado: Riverpod (v2.x con code generation). NO usar GetX ni Bloc (boilerplate innecesario para MVP).
+
+Routing: go_router para manejo de navegación declarativa y deep links.
+
+Modelos: freezed + json_serializable para inmutabilidad y parseo seguro.
+
+Estilos: Material 3 activado (useMaterial3: true).
+
+4.2. Estructura de Carpetas (Feature-First)
+
+lib/
+├── src/
+│   ├── features/
+│   │   ├── authentication/   # Login, Registro
+│   │   ├── dashboard/        # Home, Feed, Misiones
+│   │   ├── training_log/     # Check-in, IA Analysis
+│   │   └── social_rivals/    # Modo VS, Perfil amigos
+│   ├── shared/               # Widgets comunes, Themes
+│   ├── services/             # Firebase, Gemini API, Geolocator
+│   └── routing/              # AppRouter config
+└── main.dart
+
+
+4.3. Reglas de Seguridad Firestore (Firestore Rules)
+
+Copia y pega estas reglas en la consola de Firebase para garantizar la privacidad:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Función helper para ver si está autenticado
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // 1. Usuarios: Cualquiera puede leer perfiles básicos, solo dueño edita
+    match /users/{userId} {
+      allow read: if isSignedIn(); 
+      allow write: if request.auth.uid == userId;
+      
+      // 2. Technical Logs (PRIVADO): Solo el dueño lee y escribe
+      match /technical_logs/{logId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+      
+      // 3. Rivals (PRIVADO): Solo el dueño lee y escribe
+      match /rivals/{rivalId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
+
+    // 4. Actividades (PÚBLICO): Feed social
+    match /activities/{activityId} {
+      allow read: if isSignedIn(); // Todo el mundo ve que entrenaste
+      allow create: if request.auth.uid == request.resource.data.user_id;
+      // Solo el dueño puede editar/borrar su actividad (ej: borrar un entreno erróneo)
+      allow update, delete: if request.auth.uid == resource.data.user_id;
+    }
+    
+    // 5. Academias (GLOBAL): Lectura pública
+    match /academies/{academyId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Solo admin (o cloud functions) crea academias por ahora
+    }
+  }
+}
