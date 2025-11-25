@@ -64,7 +64,7 @@ REGLAS:
 
 // TODO: Replace with actual API key management (e.g. from environment or remote config)
 final geminiApiKeyProvider = Provider<String>((ref) {
-  return 'YOUR_API_KEY_HERE'; 
+  return 'AIzaSyDbH8IjJKAe7NLPB2MO7IzOSJVP7qUgxms'; 
 });
 
 final geminiServiceProvider = Provider<GeminiService>((ref) {

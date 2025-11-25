@@ -46,28 +46,16 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
         List<ProcessedTechnique> techniques = [];
 
         if (hasNotes) {
-          final result = await ref
-              .read(geminiServiceProvider)
-              .processTechnicalNote(_notesController.text);
+          // AI processing disabled for now
+          // final result = await ref.read(geminiServiceProvider).processTechnicalNote(_notesController.text);
           
-          aiSummary = result['summary'] ?? '';
-          final techniquesList = result['techniques'] as List? ?? [];
-          techniques = techniquesList.map((t) => ProcessedTechnique(
-            techniqueName: t['name'] ?? '',
-            category: t['type'] ?? '',
-            positionStart: t['position_start'] ?? '',
-            positionEnd: t['position_end'] ?? '',
-            tags: [], // TODO: Extract tags if needed
-            masteryLevel: 0,
-          )).toList();
-
           final logId = const Uuid().v4();
           final technicalLog = TechnicalLog(
             logId: logId,
             activityRef: activityId,
             rawInputText: _notesController.text,
-            processedTechniques: techniques,
-            aiSummary: aiSummary,
+            processedTechniques: [], // No AI processing
+            aiSummary: '', // No AI summary
             createdAt: now,
           );
 

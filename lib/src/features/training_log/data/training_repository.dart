@@ -9,10 +9,18 @@ class TrainingRepository {
   TrainingRepository(this._firestore);
 
   Future<void> addActivity(Activity activity) async {
-    await _firestore
-        .collection('activities')
-        .doc(activity.activityId)
-        .set(activity.toJson());
+    try {
+      print('DEBUG: Attempting to add activity: ${activity.activityId}');
+      await _firestore
+          .collection('activities')
+          .doc(activity.activityId)
+          .set(activity.toJson());
+      print('DEBUG: Activity added successfully');
+    } catch (e, stackTrace) {
+      print('DEBUG: Error adding activity: $e');
+      print('DEBUG: Stack trace: $stackTrace');
+      throw e; // Re-throw to let UI handle it
+    }
   }
 
   Future<void> addTechnicalLog(String userId, TechnicalLog log) async {

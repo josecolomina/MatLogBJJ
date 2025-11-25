@@ -16,31 +16,62 @@ class RivalsScreen extends ConsumerWidget {
     final rivalsStream = ref.watch(rivalsRepositoryProvider).getRivals(user.uid);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Rivals')),
+      appBar: AppBar(title: const Text('Amigos')),
       body: StreamBuilder<List<Rival>>(
         stream: rivalsStream,
         builder: (context, snapshot) {
-          if (snapshot.hasError) return Text('Error: ${snapshot.error}');
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
 
           final rivals = snapshot.data ?? [];
 
           if (rivals.isEmpty) {
-            return const Center(child: Text('No rivals yet. Add a match!'));
+            return const Center(child: Text('Aún no tienes amigos. ¡Añade uno!'));
           }
 
-          return ListView.builder(
+          return ListView.separated(
+            padding: const EdgeInsets.all(16),
             itemCount: rivals.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final rival = rivals[index];
-              return ListTile(
-                title: Text(rival.rivalName),
-                subtitle: Text('W: ${rival.wins} - L: ${rival.losses} - D: ${rival.draws}'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () => _showAddMatchDialog(context, ref, user.uid, rival),
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: CircleAvatar(
+                    backgroundColor: const Color(0xFFE3F2FD),
+                    child: Text(
+                      rival.rivalName[0].toUpperCase(),
+                      style: const TextStyle(
+                        color: Color(0xFF1565C0),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    rival.rivalName,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      'V: ${rival.wins} - D: ${rival.losses} - E: ${rival.draws}',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.add_circle_outline, color: Color(0xFF1565C0)),
+                    onPressed: () => _showAddMatchDialog(context, ref, user.uid, rival),
+                  ),
                 ),
               );
             },
@@ -57,35 +88,35 @@ class RivalsScreen extends ConsumerWidget {
   void _showAddMatchDialog(BuildContext context, WidgetRef ref, String userId, Rival rival) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Match vs ${rival.rivalName}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('I Won'),
-              onTap: () {
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Combate vs ${rival.rivalName}'),
+          content: const Text('¿Cuál fue el resultado?'),
+          actions: [
+            TextButton(
+              onPressed: () {
                 ref.read(rivalsRepositoryProvider).addMatchResult(userId, rival.rivalUid, rival.rivalName, 'win');
-                context.pop();
+                Navigator.of(context).pop();
               },
+              child: const Text('Victoria'),
             ),
-            ListTile(
-              title: const Text('I Lost'),
-              onTap: () {
+            TextButton(
+              onPressed: () {
                 ref.read(rivalsRepositoryProvider).addMatchResult(userId, rival.rivalUid, rival.rivalName, 'loss');
-                context.pop();
+                Navigator.of(context).pop();
               },
+              child: const Text('Derrota'),
             ),
-            ListTile(
-              title: const Text('Draw'),
-              onTap: () {
+            TextButton(
+              onPressed: () {
                 ref.read(rivalsRepositoryProvider).addMatchResult(userId, rival.rivalUid, rival.rivalName, 'draw');
-                context.pop();
+                Navigator.of(context).pop();
               },
+              child: const Text('Empate'),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -93,35 +124,34 @@ class RivalsScreen extends ConsumerWidget {
     final nameController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('New Rival'),
-        content: TextField(
-          controller: nameController,
-          decoration: const InputDecoration(labelText: 'Rival Name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text('Cancel'),
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Nuevo Amigo'),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'Nombre del amigo'),
           ),
-          TextButton(
-            onPressed: () {
-              // For MVP, using name as ID is risky but simple. Ideally select from users.
-              // Here we just create a dummy ID based on name for simplicity if not selecting real users.
-              // But PRD says "Select Rival (List of friends)".
-              // For now, we'll just allow adding by name and generating a random ID or using name.
-              final name = nameController.text.trim();
-              if (name.isNotEmpty) {
-                // We don't have a "friends" list implemented yet, so we just add a "rival" by name.
-                // We'll treat this as registering a new rival.
-                // To actually "add" them to the list, we need to record a match or just create the doc.
-                // The repository addMatchResult creates if not exists.
-                // So we can just trigger a match or create a method to add without match.
-                // For MVP, let's just add a match immediately or create a dummy match?
-                // Or better, update repo to allow creating rival without match.
-                // For now, let's just close and let user add match from list? No, list is empty.
-                // So we need to add match to create rival.
-                _showAddMatchDialog(context, ref, userId, Rival(
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                final name = nameController.text.trim();
+                if (name.isNotEmpty) {
+                  // TODO: Implement proper friend system.
+                  // For now, we reuse the "rival" logic but call it "friend/amigo" in UI.
+                  // We'll treat this as registering a new rival/friend.
+                  // Currently, the backend requires adding a match to create a rival document
+                  // if it doesn't exist, or we can just create it.
+                  // For simplicity in this prototype, we'll trigger a "draw" match 
+                  // or just update the logic later.
+                  // Let's just add a dummy match to initialize the friend for now
+                  // Or better, update repo to allow creating rival without match.
+                  
+                  // So we need to add match to create rival.
+                  _showAddMatchDialog(context, ref, userId, Rival(
                   rivalUid: name.toLowerCase().replaceAll(' ', '_'), // Dummy ID
                   rivalName: name,
                   wins: 0,
@@ -135,7 +165,8 @@ class RivalsScreen extends ConsumerWidget {
             child: const Text('Next'),
           ),
         ],
-      ),
+        );
+      },
     );
   }
 }
