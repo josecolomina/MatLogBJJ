@@ -27,7 +27,7 @@ class HomeScreen extends ConsumerWidget {
         title: Column(
           children: [
             const Text(
-              'Bienvenido a MatLog',
+              'MatLog',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -152,21 +152,15 @@ class HomeScreen extends ConsumerWidget {
     final splashes = [
       '¡Oss!',
       'La técnica vence a la fuerza.',
-      'Un cinturón negro es un cinturón blanco que nunca se rindió.',
-      'No hay ascensor al éxito, tienes que tomar las escaleras.',
       'El tatami no miente.',
       'Entrena duro, lucha fácil.',
       'Jiu Jitsu para todos.',
-      'Mantén la calma y sigue rodando.',
-      'La consistencia es la clave.',
-      'Aprende a estar cómodo en lo incómodo.',
+      'Mantén la calma.',
       'Deja el ego en la puerta.',
       'Ganar o aprender.',
       'El sudor ahorra sangre.',
-      'La disciplina te llevará donde la motivación no puede.',
       'Respeta a tus compañeros.',
       'Cuida a tu uke.',
-      'La repetición es la madre de la habilidad.',
       'Fluye como el agua.',
       'Presión, presión, presión.',
       '¡A entrenar!',

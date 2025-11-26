@@ -35,14 +35,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // Navigation is handled by the router listening to auth state changes
       } on FirebaseAuthException catch (e) {
         String errorMessage = 'Ocurrió un error desconocido';
-        if (e.code == 'user-not-found') {
-          errorMessage = 'No existe ningún usuario con este correo.';
-        } else if (e.code == 'wrong-password') {
-          errorMessage = 'Contraseña incorrecta.';
+        if (e.code == 'user-not-found' || e.code == 'wrong-password' || e.code == 'invalid-credential') {
+          errorMessage = 'Usuario o contraseña incorrectos.';
         } else if (e.code == 'invalid-email') {
           errorMessage = 'El correo electrónico no es válido.';
         } else if (e.code == 'user-disabled') {
           errorMessage = 'Este usuario ha sido deshabilitado.';
+        } else {
+          errorMessage = 'Error: ${e.code}'; // Show code for debugging if unknown
         }
         
         if (mounted) {

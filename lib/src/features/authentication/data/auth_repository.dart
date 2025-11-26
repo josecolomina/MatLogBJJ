@@ -4,8 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthRepository {
   final FirebaseAuth _firebaseAuth;
+  final FirebaseFirestore _firestore;
 
-  AuthRepository(this._firebaseAuth);
+  AuthRepository(this._firebaseAuth, this._firestore);
 
   Stream<User?> authStateChanges() => _firebaseAuth.authStateChanges();
 
@@ -25,7 +26,7 @@ class AuthRepository {
     );
 
     if (userCredential.user != null) {
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+      await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'email': email,
         'createdAt': FieldValue.serverTimestamp(),
         'last_activity_week': '',
@@ -43,8 +44,15 @@ final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
   return FirebaseAuth.instance;
 });
 
+final firestoreProvider = Provider<FirebaseFirestore>((ref) {
+  return FirebaseFirestore.instance;
+});
+
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepository(ref.watch(firebaseAuthProvider));
+  return AuthRepository(
+    ref.watch(firebaseAuthProvider),
+    ref.watch(firestoreProvider),
+  );
 });
 
 final authStateChangesProvider = StreamProvider<User?>((ref) {
