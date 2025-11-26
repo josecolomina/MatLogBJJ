@@ -12,8 +12,7 @@ abstract class Activity with _$Activity {
     required String userName,
     required String userRank,
     required String academyName,
-    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
-    required DateTime timestampStart,
+    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) required DateTime timestampStart,
     required int durationMinutes,
     required String type, // gi, nogi, open_mat, seminar
     required int rpe,

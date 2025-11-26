@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../authentication/data/auth_repository.dart';
 import '../data/training_repository.dart';
-import '../../../services/gemini_service.dart';
 import '../domain/activity.dart';
 import '../domain/technical_log.dart';
 
@@ -40,10 +39,6 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
         final activityId = const Uuid().v4();
         final now = DateTime.now();
         final hasNotes = _notesController.text.isNotEmpty;
-
-        // Process notes with AI if present
-        String aiSummary = '';
-        List<ProcessedTechnique> techniques = [];
 
         if (hasNotes) {
           // AI processing disabled for now

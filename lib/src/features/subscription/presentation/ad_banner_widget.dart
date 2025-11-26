@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/subscription_repository.dart';
-import '../domain/subscription_tier.dart';
 
 class AdBannerWidget extends ConsumerWidget {
   const AdBannerWidget({super.key});
@@ -37,7 +36,7 @@ class AdBannerWidget extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }

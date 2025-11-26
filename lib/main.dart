@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'src/features/notifications/data/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'src/routing/app_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -8,15 +9,25 @@ import 'src/features/subscription/data/revenue_cat_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   print('FIREBASE DEBUG: API Key: ${Firebase.app().options.apiKey}');
   print('FIREBASE DEBUG: Project ID: ${Firebase.app().options.projectId}');
   print('FIREBASE DEBUG: App ID: ${Firebase.app().options.appId}');
   await RevenueCatService().init();
   await initializeDateFormatting('es', null);
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
-  runApp(const ProviderScope(child: MatLogApp()));
+
+  // Initialize Notification Service
+  final container = ProviderContainer();
+  await container.read(notificationServiceProvider).init();
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const MatLogApp(),
+    ),
+  );
 }
 
 class MatLogApp extends ConsumerWidget {
@@ -83,7 +94,7 @@ class MatLogApp extends ConsumerWidget {
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 2,
-          shadowColor: Colors.black.withOpacity(0.1),
+          shadowColor: Colors.black.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

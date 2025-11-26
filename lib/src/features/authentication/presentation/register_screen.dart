@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../data/auth_repository.dart';
+import '../domain/belt_info.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -15,6 +16,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  BeltColor _selectedBelt = BeltColor.white;
+  int _selectedStripes = 0;
   bool _isLoading = false;
 
   @override
@@ -31,6 +34,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         await ref.read(authRepositoryProvider).createUserWithEmailAndPassword(
               _emailController.text.trim(),
               _passwordController.text.trim(),
+              BeltInfo(color: _selectedBelt, stripes: _selectedStripes),
             );
         // Navigation is handled by the router listening to auth state changes
       } on FirebaseAuthException catch (e) {
@@ -127,6 +131,48 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       }
                       return null;
                     },
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<BeltColor>(
+                          value: _selectedBelt,
+                          decoration: const InputDecoration(
+                            labelText: 'Cinturón',
+                            prefixIcon: Icon(Icons.sports_martial_arts),
+                          ),
+                          items: BeltColor.values.map((belt) {
+                            return DropdownMenuItem(
+                              value: belt,
+                              child: Text(belt.displayName),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) setState(() => _selectedBelt = value);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: DropdownButtonFormField<int>(
+                          value: _selectedStripes,
+                          decoration: const InputDecoration(
+                            labelText: 'Grados',
+                            prefixIcon: Icon(Icons.linear_scale),
+                          ),
+                          items: List.generate(5, (index) {
+                            return DropdownMenuItem(
+                              value: index,
+                              child: Text('$index'),
+                            );
+                          }),
+                          onChanged: (value) {
+                            if (value != null) setState(() => _selectedStripes = value);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 32),
                   _isLoading

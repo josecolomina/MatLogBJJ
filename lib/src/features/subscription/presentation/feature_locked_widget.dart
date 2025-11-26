@@ -39,7 +39,7 @@ class FeatureLockedWidget extends ConsumerWidget {
             // Lock Overlay
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.4),
+                color: Colors.black.withValues(alpha: 0.4),
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -76,7 +76,7 @@ class FeatureLockedWidget extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => child, // Fallback to showing content on error
+      error: (_, _) => child, // Fallback to showing content on error
     );
   }
 }

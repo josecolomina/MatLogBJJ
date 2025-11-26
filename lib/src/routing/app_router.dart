@@ -6,6 +6,7 @@ import '../features/authentication/data/auth_repository.dart';
 import '../features/authentication/presentation/login_screen.dart';
 import '../features/authentication/presentation/register_screen.dart';
 import '../features/dashboard/presentation/home_screen.dart';
+import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/training_log/presentation/check_in_screen.dart';
 import '../features/social_rivals/presentation/rivals_screen.dart';
 
@@ -19,21 +20,25 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final user = authRepository.currentUser;
       final isLoggedIn = user != null;
       final isLoggingIn = state.uri.toString() == '/login';
-      final isRegistering = state.uri.toString() == '/register';
+      final isOnboarding = state.uri.toString() == '/onboarding';
 
-      if (!isLoggedIn && !isLoggingIn && !isRegistering) {
-        return '/login';
+      if (!isLoggedIn && !isLoggingIn && !isOnboarding) {
+        return '/onboarding';
       }
 
-      if (isLoggedIn && (isLoggingIn || isRegistering)) {
-        return '/';
+      if (isLoggedIn && (isLoggingIn || isOnboarding)) {
+        return '/home';
       }
 
       return null;
     },
     routes: [
       GoRoute(
-        path: '/',
+        path: '/onboarding',
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: '/home',
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(

@@ -51,7 +51,6 @@ void main() {
 
     // Attempt to pop (system back button simulation)
     // In a real app this might close the app, in test environment it shouldn't crash
-    final dynamic state = tester.state(find.byType(MaterialApp));
     // We can't easily simulate system back button in widget test without platform channel mocking,
     // but we can verify the router state is stable.
     

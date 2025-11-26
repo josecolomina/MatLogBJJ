@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 import '../domain/subscription_tier.dart';
 import 'revenue_cat_provider.dart';
 

@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:matlog/src/features/training_log/data/training_repository.dart';
 import '../../subscription/presentation/paywall_screen.dart';
+import '../../profile/presentation/profile_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -30,6 +31,15 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         children: [
           const _SectionHeader(title: 'Account'),
+          ListTile(
+            leading: const Icon(Icons.person, color: Colors.blue),
+            title: const Text('Mi Perfil'),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.star, color: Colors.amber),
             title: const Text('Manage Subscription'),

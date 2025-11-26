@@ -3,6 +3,7 @@ import 'package:mockito/mockito.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:matlog/src/features/authentication/data/auth_repository.dart';
+import 'package:matlog/src/features/authentication/domain/belt_info.dart';
 import 'auth_repository_test.mocks.dart';
 
 void main() {
@@ -28,6 +29,25 @@ void main() {
 
       expect(
         () => authRepository.signInWithEmailAndPassword('test@example.com', 'password'),
+        throwsA(isA<FirebaseAuthException>()),
+      );
+    });
+
+    test('createUserWithEmailAndPassword throws on network error', () async {
+      when(mockFirebaseAuth.createUserWithEmailAndPassword(
+        email: anyNamed('email'),
+        password: anyNamed('password'),
+      )).thenThrow(FirebaseAuthException(
+        code: 'network-request-failed',
+        message: 'Network error',
+      ));
+
+      expect(
+        () async => await authRepository.createUserWithEmailAndPassword(
+          'test@example.com',
+          'password123',
+          const BeltInfo(color: BeltColor.white, stripes: 0),
+        ),
         throwsA(isA<FirebaseAuthException>()),
       );
     });
@@ -62,7 +82,11 @@ void main() {
         password: 'password',
       )).thenAnswer((_) async => mockUserCredential);
 
-      await authRepository.createUserWithEmailAndPassword(specialEmail, 'password');
+      await authRepository.createUserWithEmailAndPassword(
+        specialEmail,
+        'password',
+        const BeltInfo(color: BeltColor.white, stripes: 0),
+      );
 
       verify(mockFirebaseAuth.createUserWithEmailAndPassword(
         email: specialEmail,

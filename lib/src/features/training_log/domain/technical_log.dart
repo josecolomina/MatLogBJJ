@@ -12,8 +12,7 @@ abstract class TechnicalLog with _$TechnicalLog {
     required String rawInputText,
     required List<ProcessedTechnique> processedTechniques,
     required String aiSummary,
-    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson)
-    required DateTime createdAt,
+    @JsonKey(fromJson: _timestampFromJson, toJson: _timestampToJson) required DateTime createdAt,
   }) = _TechnicalLog;
 
   factory TechnicalLog.fromJson(Map<String, dynamic> json) =>

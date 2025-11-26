@@ -5,6 +5,8 @@ import 'package:matlog/src/features/settings/presentation/settings_screen.dart';
 import '../../authentication/data/auth_repository.dart';
 import '../../social_rivals/presentation/feed_screen.dart';
 import '../../subscription/presentation/ad_banner_widget.dart';
+import 'package:matlog/src/common_widgets/belt_display_widget.dart';
+import '../../profile/data/profile_repository.dart';
 import 'dashboard_controller.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -28,11 +30,22 @@ class HomeScreen extends ConsumerWidget {
         ),
         title: Column(
           children: [
-            const Text(
-              'MatLog',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'MatLog',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 8),
+                ref.watch(userBeltInfoProvider).when(
+                      data: (belt) => BeltDisplayWidget(beltInfo: belt, height: 16, width: 60),
+                      loading: () => const SizedBox.shrink(),
+                      error: (_, __) => const SizedBox.shrink(),
+                    ),
+              ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               _getRandomSplashText(),
               style: TextStyle(

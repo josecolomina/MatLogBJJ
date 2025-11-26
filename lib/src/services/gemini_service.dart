@@ -62,8 +62,14 @@ REGLAS:
   }
 }
 
-// TODO: Replace with actual API key management (e.g. from environment or remote config)
+// Production: Move API key to environment variable or Firebase Remote Config
 final geminiApiKeyProvider = Provider<String>((ref) {
+  // Try to get from environment variable first
+  const apiKey = String.fromEnvironment('GEMINI_API_KEY');
+  if (apiKey.isNotEmpty) {
+    return apiKey;
+  }
+  // Fallback for development (WARNING: Remove in production)
   return 'AIzaSyDbH8IjJKAe7NLPB2MO7IzOSJVP7qUgxms'; 
 });
 

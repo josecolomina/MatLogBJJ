@@ -4,6 +4,7 @@ import 'package:mockito/annotations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:matlog/src/features/authentication/data/auth_repository.dart';
+import 'package:matlog/src/features/authentication/domain/belt_info.dart';
 
 // Generate mocks for FirebaseAuth, User, and UserCredential
 @GenerateMocks([FirebaseAuth, User, UserCredential])
@@ -66,7 +67,11 @@ void main() {
       when(mockFirebaseAuth.currentUser).thenReturn(mockUser);
 
       // Act
-      await authRepository.createUserWithEmailAndPassword('new@example.com', 'password');
+      await authRepository.createUserWithEmailAndPassword(
+        'new@example.com',
+        'password',
+        const BeltInfo(color: BeltColor.white, stripes: 0),
+      );
 
       // Assert
       verify(mockFirebaseAuth.createUserWithEmailAndPassword(
