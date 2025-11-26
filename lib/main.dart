@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'src/features/notifications/data/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'src/routing/app_router.dart';
+import 'src/features/notifications/data/notification_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'src/features/subscription/data/revenue_cat_provider.dart';
-// import 'firebase_options.dart'; // TODO: Uncomment when firebase_options.dart is generated
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

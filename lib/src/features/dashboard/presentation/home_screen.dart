@@ -23,37 +23,27 @@ class HomeScreen extends ConsumerWidget {
     
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 80, // Increase height to fit two lines
         leading: IconButton(
           icon: const Icon(Icons.people_outline),
           onPressed: () => context.push('/rivals'),
         ),
-        title: Column(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'MatLog',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const Text(
+              'MatLog',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 12),
+            ref.watch(userBeltInfoProvider).when(
+                  data: (belt) => BeltDisplayWidget(
+                    beltInfo: belt,
+                    height: 32,
+                    width: 120,
+                  ),
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, _) => const SizedBox.shrink(),
                 ),
-                const SizedBox(width: 8),
-                ref.watch(userBeltInfoProvider).when(
-                      data: (belt) => BeltDisplayWidget(beltInfo: belt, height: 16, width: 60),
-                      loading: () => const SizedBox.shrink(),
-                      error: (_, __) => const SizedBox.shrink(),
-                    ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              _getRandomSplashText(),
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
           ],
         ),
         actions: [

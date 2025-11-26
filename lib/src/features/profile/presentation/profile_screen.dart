@@ -6,6 +6,8 @@ import '../../authentication/data/auth_repository.dart';
 import '../data/profile_repository.dart';
 import '../../notifications/data/notification_service.dart';
 import '../../dashboard/presentation/dashboard_controller.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -18,6 +20,32 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   BeltColor? _selectedBelt;
   int? _selectedStripes;
   bool _isLoading = false;
+  File? _profileImage;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 85,
+      );
+      
+      if (image != null) {
+        setState(() {
+          _profileImage = File(image.path);
+        });
+        // TODO: Upload to Firebase Storage in future
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al seleccionar imagen: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,24 +73,71 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     Center(
                       child: Column(
                         children: [
-                          const CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Color(0xFFE0E0E0),
-                            child: Icon(Icons.person, size: 60, color: Colors.grey),
+                          GestureDetector(
+                            onTap: _pickImage,
+                            child: Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 60,
+                                  backgroundColor: const Color(0xFFE0E0E0),
+                                  backgroundImage: _profileImage != null 
+                                      ? FileImage(_profileImage!) 
+                                      : null,
+                                  child: _profileImage == null
+                                      ? const Icon(Icons.person, size: 70, color: Colors.grey)
+                                      : null,
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF1565C0),
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 4,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(
+                                      Icons.camera_alt,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 24),
                           const Text(
                             'Tu Cinturón Actual',
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey,
+                            ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           BeltDisplayWidget(
                             beltInfo: BeltInfo(
                               color: _selectedBelt!,
                               stripes: _selectedStripes!,
                             ),
-                            height: 40,
-                            width: 200,
+                            height: 60,
+                            width: 280,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${_selectedBelt!.displayName} - $_selectedStripes ${_selectedStripes == 1 ? "grado" : "grados"}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
@@ -125,50 +200,153 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 24),
-                    DropdownButtonFormField<BeltColor>(
-                      value: _selectedBelt,
-                      decoration: const InputDecoration(
-                        labelText: 'Cinturón',
-                        prefixIcon: Icon(Icons.sports_martial_arts),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      items: BeltColor.values.map((belt) {
-                        return DropdownMenuItem(
-                          value: belt,
-                          child: Text(belt.displayName),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value != null) setState(() => _selectedBelt = value);
-                      },
+                      child: DropdownButtonFormField<BeltColor>(
+                        value: _selectedBelt,
+                        decoration: InputDecoration(
+                          labelText: 'Cinturón',
+                          labelStyle: const TextStyle(
+                            color: Color(0xFF1565C0),
+                            fontWeight: FontWeight.w600,
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.sports_martial_arts,
+                            color: Color(0xFF1565C0),
+                            size: 28,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 20,
+                          ),
+                        ),
+                        items: BeltColor.values.map((belt) {
+                          return DropdownMenuItem(
+                            value: belt,
+                            child: Text(
+                              belt.displayName,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value != null) setState(() => _selectedBelt = value);
+                        },
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    DropdownButtonFormField<int>(
-                      value: _selectedStripes,
-                      decoration: const InputDecoration(
-                        labelText: 'Grados',
-                        prefixIcon: Icon(Icons.linear_scale),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      items: List.generate(5, (index) {
-                        return DropdownMenuItem(
-                          value: index,
-                          child: Text('$index'),
-                        );
-                      }),
-                      onChanged: (value) {
-                        if (value != null) setState(() => _selectedStripes = value);
-                      },
+                      child: DropdownButtonFormField<int>(
+                        value: _selectedStripes,
+                        decoration: InputDecoration(
+                          labelText: 'Grados',
+                          labelStyle: const TextStyle(
+                            color: Color(0xFF1565C0),
+                            fontWeight: FontWeight.w600,
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.linear_scale,
+                            color: Color(0xFF1565C0),
+                            size: 28,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 20,
+                          ),
+                        ),
+                        items: List.generate(5, (index) {
+                          return DropdownMenuItem(
+                            value: index,
+                            child: Text(
+                              '$index',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        }),
+                        onChanged: (value) {
+                          if (value != null) setState(() => _selectedStripes = value);
+                        },
+                      ),
                     ),
                     const SizedBox(height: 40),
                     SizedBox(
                       width: double.infinity,
+                      height: 56,
                       child: _isLoading
                           ? const Center(child: CircularProgressIndicator())
-                          : ElevatedButton(
-                              onPressed: () => _saveProfile(ref),
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                          : Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF1565C0), Color(0xFF0D47A1)],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF1565C0).withValues(alpha: 0.3),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                              child: const Text('Guardar Cambios'),
+                              child: ElevatedButton(
+                                onPressed: () => _saveProfile(ref),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Guardar Cambios',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
                             ),
                     ),
                     const SizedBox(height: 32),

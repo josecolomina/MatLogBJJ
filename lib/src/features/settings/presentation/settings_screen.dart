@@ -57,11 +57,6 @@ class SettingsScreen extends ConsumerWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.download),
-            title: const Text('Export Data (JSON)'),
-            onTap: () => _exportData(context, ref),
-          ),
-          ListTile(
             leading: const Icon(Icons.delete_forever, color: Colors.red),
             title: const Text('Delete Account', style: TextStyle(color: Colors.red)),
             onTap: () {

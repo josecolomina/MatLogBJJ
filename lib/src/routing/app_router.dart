@@ -19,13 +19,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final user = authRepository.currentUser;
       final isLoggedIn = user != null;
-      final isLoggingIn = state.uri.toString() == '/login';
-      final isOnboarding = state.uri.toString() == '/onboarding';
+      final location = state.uri.toString();
+      final isOnRoot = location == '/';
+      final isLoggingIn = location == '/login';
+      final isOnboarding = location == '/onboarding';
 
+      // Redirect from root
+      if (isOnRoot) {
+        return isLoggedIn ? '/home' : '/onboarding';
+      }
+
+      // If not logged in and not on login/onboarding pages, redirect to onboarding
       if (!isLoggedIn && !isLoggingIn && !isOnboarding) {
         return '/onboarding';
       }
 
+      // If logged in and trying to access login/onboarding, redirect to home
       if (isLoggedIn && (isLoggingIn || isOnboarding)) {
         return '/home';
       }
