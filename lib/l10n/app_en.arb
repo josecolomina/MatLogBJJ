@@ -1,0 +1,93 @@
+{
+  "appTitle": "MatLog",
+  "weeklyGoal": "Weekly Goal",
+  "sessions": "sessions",
+  "recentActivity": "Recent Activity",
+  "profileTitle": "My Profile",
+  "currentBelt": "Current Belt",
+  "degree": "degree",
+  "degrees": "degrees",
+  "editProgress": "Edit Progress",
+  "belt": "Belt",
+  "stripes": "Stripes",
+  "saveChanges": "Save Changes",
+  "notificationsSchedule": "Notifications & Schedule",
+  "trainingDays": "Training Days",
+  "usualTime": "Usual Class Time",
+  "linkEmail": "Link Email",
+  "secureAccount": "Secure Account",
+  "saveProgress": "Save your progress",
+  "linkAccountDesc": "Link your account to an email to avoid losing data if you change devices.",
+  "rivalsTitle": "Training Partners",
+  "noRivals": "No training partners yet.",
+  "addRival": "Add Partner",
+  "newRivalTitle": "New Partner",
+  "nameLabel": "Name",
+  "saveLabel": "Save",
+  "cancelLabel": "Cancel",
+  "matchVs": "Match vs",
+  "winLabel": "Win",
+  "lossLabel": "Loss",
+  "drawLabel": "Draw",
+  "techniqueLibraryTitle": "Technique Library",
+  "noTechniques": "No techniques learned yet.",
+  "repetitionsLabel": "Repetitions",
+  "levelLabel": "Level",
+  "techniqueDetailTitle": "Technique Detail",
+  "notesLabel": "Notes",
+  "saveNotes": "Save Notes",
+  "historyLabel": "History",
+  "checkInTitle": "Check-in",
+  "sessionType": "Session Type",
+  "durationLabel": "Duration",
+  "trainingNotes": "Training Notes",
+  "settingsTitle": "Settings",
+  "accountSection": "Account",
+  "manageSubscription": "Manage Subscription",
+  "signOut": "Sign Out",
+  "deleteAccount": "Delete Account",
+  "aboutSection": "About",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "versionLabel": "Version",
+  "pleaseLogin": "Please login",
+  "errorLabel": "Error: {error}",
+  "@errorLabel": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "matchResultQuestion": "What was the result of the training?",
+  "addedRivalMessage": "{name} added to your rivals",
+  "@addedRivalMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSelectionError": "Error selecting image: {error}",
+  "@imageSelectionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleUpdated": "Schedule updated",
+  "profileUpdated": "Profile updated successfully",
+  "updateError": "Error updating: {error}",
+  "@updateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSecured": "Account secured successfully!",
+  "linkButton": "Link",
+  "trainingLogged": "Training logged successfully!",
+  "rpeLabel": "RPE (Intensity)"
+}

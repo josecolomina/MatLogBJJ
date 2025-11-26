@@ -15,12 +15,28 @@ class TrainingRepository {
           .collection('activities')
           .doc(activity.activityId)
           .set(activity.toJson());
+      
+      // Update weekly goal progress
+      // Ideally this should be a transaction or a cloud function, but for now client-side is fine for MVP
+      final userRef = _firestore.collection('users').doc(activity.userId);
+      await userRef.update({
+        'weekly_goal_progress': FieldValue.increment(1),
+        'last_activity_week': _getCurrentWeek(),
+      });
+
       print('DEBUG: Activity added successfully');
     } catch (e, stackTrace) {
       print('DEBUG: Error adding activity: $e');
       print('DEBUG: Stack trace: $stackTrace');
       throw e; // Re-throw to let UI handle it
     }
+  }
+
+  String _getCurrentWeek() {
+    final now = DateTime.now();
+    final dayOfYear = int.parse("${now.year}${now.difference(DateTime(now.year, 1, 1)).inDays + 1}");
+    final week = (dayOfYear / 7).ceil();
+    return "${now.year}-W$week";
   }
 
   Future<void> addTechnicalLog(String userId, TechnicalLog log) async {

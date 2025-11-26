@@ -8,9 +8,14 @@ void main() {
     late FakeFirebaseFirestore mockFirestore;
     late TrainingRepository trainingRepository;
 
-    setUp(() {
+    setUp(() async {
       mockFirestore = FakeFirebaseFirestore();
       trainingRepository = TrainingRepository(mockFirestore);
+      // Create user document for update calls
+      await mockFirestore.collection('users').doc('user_123').set({
+        'weekly_goal_progress': 0,
+        'weekly_goal_target': 4,
+      });
     });
 
     test('addActivity adds document to firestore', () async {

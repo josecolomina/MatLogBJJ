@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:matlog/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -38,7 +40,14 @@ class MatLogApp extends ConsumerWidget {
     final goRouter = ref.watch(goRouterProvider);
     return MaterialApp.router(
       title: 'MatLog',
-      locale: const Locale('es'), // Force Spanish
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      // locale: const Locale('es'), // Removed to allow system detection
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

@@ -1,0 +1,449 @@
+Resolving dependencies...
+Downloading packages...
+  _fe_analyzer_shared 91.0.0 (92.0.0 available)
+  analyzer 8.4.0 (9.0.0 available)
+  analyzer_plugin 0.13.10 (0.13.11 available)
+  characters 1.4.0 (1.4.1 available)
+  json_serializable 6.11.2 (6.11.3 available)
+  matcher 0.12.17 (0.12.18 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  rx 0.4.0 (0.5.0 available)
+  source_helper 1.3.8 (1.3.9 available)
+  test 1.26.3 (1.28.0 available)
+  test_api 0.7.7 (0.7.8 available)
+  test_core 0.6.12 (0.6.14 available)
+Got dependencies!
+12 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart                                                                                                         00:01 +0: loading /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart                                                                                                         00:01 +0: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles maximum integer duration                                     00:02 +0: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles maximum integer duration                                     00:02 +1: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles maximum integer duration                                     00:02 +2: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles maximum integer duration                                     00:02 +2: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles maximum integer duration                                     
+DEBUG: Attempting to add activity: max_duration_id
+DEBUG: Error adding activity: [FakeFirestore/not-found] Some requested document was not found.
+00:02 +3: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles maximum integer duration                                     00:02 +4: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles maximum integer duration                                     00:02 +5: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles maximum integer duration                                     00:02 +5: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles maximum integer duration                                     
+DEBUG: Stack trace: dart:async/future_impl.dart 21:26                                             _interceptError
+dart:async/future_impl.dart 52:23                                             _interceptUserError
+dart:async/future.dart 393:33                                                 new Future.error
+package:fake_cloud_firestore/src/mock_document_reference.dart 103:21          MockDocumentReference.update
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:fake_cloud_firestore/src/mock_document_reference.dart 100:5           MockDocumentReference.update
+package:matlog/src/features/training_log/data/training_repository.dart 22:21  TrainingRepository.addActivity
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:matlog/src/features/training_log/data/training_repository.dart 14:7   TrainingRepository.addActivity
+test/unit/training_edge_cases_test.dart 31:32                                 main.<fn>.<fn>
+package:test_api/src/backend/declarer.dart 242:19                             Declarer.test.<fn>.<fn>
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:test_api/src/backend/declarer.dart 241:9                              Declarer.test.<fn>.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/declarer.dart 240:13                             Declarer.test.<fn>
+package:test_api/src/backend/invoker.dart 282:17                              Invoker._waitForOutstandingCallbacks.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/invoker.dart 278:5                               Invoker._waitForOutstandingCallbacks
+package:test_api/src/backend/invoker.dart 418:17                              Invoker._onRun.<fn>.<fn>.<fn>
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:test_api/src/backend/invoker.dart 416:11                              Invoker._onRun.<fn>.<fn>.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/invoker.dart 407:9                               Invoker._onRun.<fn>.<fn>
+package:test_api/src/backend/invoker.dart 450:15                              Invoker._guardIfGuarded
+package:test_api/src/backend/invoker.dart 406:7                               Invoker._onRun.<fn>
+package:stack_trace/src/chain.dart 97:24                                      Chain.capture.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:stack_trace/src/chain.dart 95:12                                      Chain.capture
+package:test_api/src/backend/invoker.dart 405:11                              Invoker._onRun
+package:test_api/src/backend/live_test_controller.dart 153:11                 LiveTestController.run
+package:test_api/src/backend/remote_listener.dart 275:16                      RemoteListener._runLiveTest.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/remote_listener.dart 274:5                       RemoteListener._runLiveTest
+package:test_api/src/backend/remote_listener.dart 221:7                       RemoteListener._serializeTest.<fn>
+dart:async/zone.dart 1538:47                                                  _rootRunUnary
+dart:async/zone.dart 1429:19                                                  _CustomZone.runUnary
+dart:async/zone.dart 1329:7                                                   _CustomZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/zone.dart 1546:13                                                  _rootRunUnary
+dart:async/zone.dart 1429:19                                                  _CustomZone.runUnary
+dart:async/zone.dart 1329:7                                                   _CustomZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/stream_controller.dart 898:13                                      _StreamSinkWrapper.add
+package:stream_channel/src/guarantee_channel.dart 125:12                      _GuaranteeSink.add
+package:stream_channel/src/multi_channel.dart 159:31                          new _MultiChannel.<fn>
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:_internal/async_cast.dart 95:11                                          CastStreamSubscription._onData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/stream_controller.dart 898:13                                      _StreamSinkWrapper.add
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_pipe.dart 154:11                                            _ForwardingStreamSubscription._add
+dart:async/stream_pipe.dart 252:10                                            _MapStream._handleData
+dart:async/stream_pipe.dart 184:13                                            _ForwardingStreamSubscription._handleData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:_http/websocket_impl.dart 1252:27                                        new _WebSocketImpl._fromSocket.<fn>
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_transformers.dart 67:11                                     _SinkTransformerStreamSubscription._add
+dart:async/stream_transformers.dart 13:11                                     _EventSinkWrapper.add
+dart:_http/websocket_impl.dart 348:23                                         _WebSocketProtocolTransformer._messageFrameEnd
+dart:_http/websocket_impl.dart 238:46                                         _WebSocketProtocolTransformer.add
+dart:async/stream_transformers.dart 115:24                                    _SinkTransformerStreamSubscription._handleData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:io-patch/socket_patch.dart 2880:41                                       _Socket._onData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:io-patch/socket_patch.dart 2315:31                                       new _RawSocket.<fn>
+dart:io-patch/socket_patch.dart 1655:14                                       _NativeSocket.issueReadEvent.issue
+dart:async/schedule_microtask.dart 40:35                                      _microtaskLoop
+dart:async/schedule_microtask.dart 49:5                                       _startMicrotaskLoop
+
+00:02 +5 -1: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles maximum integer duration [E]                              
+  [FakeFirestore/not-found] Some requested document was not found.
+  package:matlog/src/features/training_log/data/training_repository.dart 31:7  TrainingRepository.addActivity
+  
+
+To run this test again: /Users/josecolomina/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart -p vm --plain-name 'TrainingRepository Edge Cases addActivity handles maximum integer duration'
+00:02 +5 -1: loading /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart                                                                                                     00:02 +5 -1: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository incrementRepetitions creates new technique if not exists                      00:02 +5 -1: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles extremely long notes/text                                 
+DEBUG: Attempting to add activity: long_text_id
+DEBUG: Error adding activity: [FakeFirestore/not-found] Some requested document was not found.
+DEBUG: Stack trace: dart:async/future_impl.dart 21:26                                             _interceptError
+dart:async/future_impl.dart 52:23                                             _interceptUserError
+dart:async/future.dart 393:33                                                 new Future.error
+package:fake_cloud_firestore/src/mock_document_reference.dart 103:21          MockDocumentReference.update
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:fake_cloud_firestore/src/mock_document_reference.dart 100:5           MockDocumentReference.update
+package:matlog/src/features/training_log/data/training_repository.dart 22:21  TrainingRepository.addActivity
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:matlog/src/features/training_log/data/training_repository.dart 14:7   TrainingRepository.addActivity
+test/unit/training_edge_cases_test.dart 54:32                                 main.<fn>.<fn>
+package:test_api/src/backend/declarer.dart 242:19                             Declarer.test.<fn>.<fn>
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:test_api/src/backend/declarer.dart 241:9                              Declarer.test.<fn>.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/declarer.dart 240:13                             Declarer.test.<fn>
+package:test_api/src/backend/invoker.dart 282:17                              Invoker._waitForOutstandingCallbacks.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/invoker.dart 278:5                               Invoker._waitForOutstandingCallbacks
+package:test_api/src/backend/invoker.dart 418:17                              Invoker._onRun.<fn>.<fn>.<fn>
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:test_api/src/backend/invoker.dart 416:11                              Invoker._onRun.<fn>.<fn>.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/invoker.dart 407:9                               Invoker._onRun.<fn>.<fn>
+package:test_api/src/backend/invoker.dart 450:15                              Invoker._guardIfGuarded
+package:test_api/src/backend/invoker.dart 406:7                               Invoker._onRun.<fn>
+package:stack_trace/src/chain.dart 97:24                                      Chain.capture.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:stack_trace/src/chain.dart 95:12                                      Chain.capture
+package:test_api/src/backend/invoker.dart 405:11                              Invoker._onRun
+package:test_api/src/backend/live_test_controller.dart 153:11                 LiveTestController.run
+package:test_api/src/backend/remote_listener.dart 275:16                      RemoteListener._runLiveTest.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/remote_listener.dart 274:5                       RemoteListener._runLiveTest
+package:test_api/src/backend/remote_listener.dart 221:7                       RemoteListener._serializeTest.<fn>
+dart:async/zone.dart 1538:47                                                  _rootRunUnary
+dart:async/zone.dart 1429:19                                                  _CustomZone.runUnary
+dart:async/zone.dart 1329:7                                                   _CustomZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/zone.dart 1546:13                                                  _rootRunUnary
+dart:async/zone.dart 1429:19                                                  _CustomZone.runUnary
+dart:async/zone.dart 1329:7                                                   _CustomZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/stream_controller.dart 898:13                                      _StreamSinkWrapper.add
+package:stream_channel/src/guarantee_channel.dart 125:12                      _GuaranteeSink.add
+package:stream_channel/src/multi_channel.dart 159:31                          new _MultiChannel.<fn>
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:_internal/async_cast.dart 95:11                                          CastStreamSubscription._onData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/stream_controller.dart 898:13                                      _StreamSinkWrapper.add
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_pipe.dart 154:11                                            _ForwardingStreamSubscription._add
+dart:async/stream_pipe.dart 252:10                                            _MapStream._handleData
+dart:async/stream_pipe.dart 184:13                                            _ForwardingStreamSubscription._handleData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:_http/websocket_impl.dart 1252:27                                        new _WebSocketImpl._fromSocket.<fn>
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_transformers.dart 67:11                                     _SinkTransformerStreamSubscription._add
+dart:async/stream_transformers.dart 13:11                                     _EventSinkWrapper.add
+dart:_http/websocket_impl.dart 348:23                                         _WebSocketProtocolTransformer._messageFrameEnd
+dart:_http/websocket_impl.dart 238:46                                         _WebSocketProtocolTransformer.add
+dart:async/stream_transformers.dart 115:24                                    _SinkTransformerStreamSubscription._handleData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:io-patch/socket_patch.dart 2880:41                                       _Socket._onData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:io-patch/socket_patch.dart 2315:31                                       new _RawSocket.<fn>
+dart:io-patch/socket_patch.dart 1655:14                                       _NativeSocket.issueReadEvent.issue
+dart:async/schedule_microtask.dart 40:35                                      _microtaskLoop
+dart:async/schedule_microtask.dart 49:5                                       _startMicrotaskLoop
+
+00:02 +5 -2: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles extremely long notes/text [E]                             
+  [FakeFirestore/not-found] Some requested document was not found.
+  package:matlog/src/features/training_log/data/training_repository.dart 31:7  TrainingRepository.addActivity
+  
+
+To run this test again: /Users/josecolomina/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart -p vm --plain-name 'TrainingRepository Edge Cases addActivity handles extremely long notes/text'
+00:02 +5 -2: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles special characters and emojis                             
+DEBUG: Attempting to add activity: special_chars_id
+DEBUG: Error adding activity: [FakeFirestore/not-found] Some requested document was not found.
+DEBUG: Stack trace: dart:async/future_impl.dart 21:26                                             _interceptError
+dart:async/future_impl.dart 52:23                                             _interceptUserError
+dart:async/future.dart 393:33                                                 new Future.error
+package:fake_cloud_firestore/src/mock_document_reference.dart 103:21          MockDocumentReference.update
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:fake_cloud_firestore/src/mock_document_reference.dart 100:5           MockDocumentReference.update
+package:matlog/src/features/training_log/data/training_repository.dart 22:21  TrainingRepository.addActivity
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:matlog/src/features/training_log/data/training_repository.dart 14:7   TrainingRepository.addActivity
+test/unit/training_edge_cases_test.dart 80:32                                 main.<fn>.<fn>
+package:test_api/src/backend/declarer.dart 242:19                             Declarer.test.<fn>.<fn>
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:test_api/src/backend/declarer.dart 241:9                              Declarer.test.<fn>.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/declarer.dart 240:13                             Declarer.test.<fn>
+package:test_api/src/backend/invoker.dart 282:17                              Invoker._waitForOutstandingCallbacks.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/invoker.dart 278:5                               Invoker._waitForOutstandingCallbacks
+package:test_api/src/backend/invoker.dart 418:17                              Invoker._onRun.<fn>.<fn>.<fn>
+===== asynchronous gap ===========================
+dart:async/zone.dart 1450:19                                                  _CustomZone.registerUnaryCallback
+package:test_api/src/backend/invoker.dart 416:11                              Invoker._onRun.<fn>.<fn>.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/invoker.dart 407:9                               Invoker._onRun.<fn>.<fn>
+package:test_api/src/backend/invoker.dart 450:15                              Invoker._guardIfGuarded
+package:test_api/src/backend/invoker.dart 406:7                               Invoker._onRun.<fn>
+package:stack_trace/src/chain.dart 97:24                                      Chain.capture.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:stack_trace/src/chain.dart 95:12                                      Chain.capture
+package:test_api/src/backend/invoker.dart 405:11                              Invoker._onRun
+package:test_api/src/backend/live_test_controller.dart 153:11                 LiveTestController.run
+package:test_api/src/backend/remote_listener.dart 275:16                      RemoteListener._runLiveTest.<fn>
+dart:async/zone.dart 1525:13                                                  _rootRun
+dart:async/zone.dart 1422:19                                                  _CustomZone.run
+dart:async/zone.dart 2034:6                                                   _runZoned
+dart:async/zone.dart 1960:10                                                  runZoned
+package:test_api/src/backend/remote_listener.dart 274:5                       RemoteListener._runLiveTest
+package:test_api/src/backend/remote_listener.dart 221:7                       RemoteListener._serializeTest.<fn>
+dart:async/zone.dart 1538:47                                                  _rootRunUnary
+dart:async/zone.dart 1429:19                                                  _CustomZone.runUnary
+dart:async/zone.dart 1329:7                                                   _CustomZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/zone.dart 1546:13                                                  _rootRunUnary
+dart:async/zone.dart 1429:19                                                  _CustomZone.runUnary
+dart:async/zone.dart 1329:7                                                   _CustomZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/stream_controller.dart 898:13                                      _StreamSinkWrapper.add
+package:stream_channel/src/guarantee_channel.dart 125:12                      _GuaranteeSink.add
+package:stream_channel/src/multi_channel.dart 159:31                          new _MultiChannel.<fn>
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:_internal/async_cast.dart 95:11                                          CastStreamSubscription._onData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:async/stream_controller.dart 898:13                                      _StreamSinkWrapper.add
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_pipe.dart 154:11                                            _ForwardingStreamSubscription._add
+dart:async/stream_pipe.dart 252:10                                            _MapStream._handleData
+dart:async/stream_pipe.dart 184:13                                            _ForwardingStreamSubscription._handleData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:_http/websocket_impl.dart 1252:27                                        new _WebSocketImpl._fromSocket.<fn>
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_transformers.dart 67:11                                     _SinkTransformerStreamSubscription._add
+dart:async/stream_transformers.dart 13:11                                     _EventSinkWrapper.add
+dart:_http/websocket_impl.dart 348:23                                         _WebSocketProtocolTransformer._messageFrameEnd
+dart:_http/websocket_impl.dart 238:46                                         _WebSocketProtocolTransformer.add
+dart:async/stream_transformers.dart 115:24                                    _SinkTransformerStreamSubscription._handleData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:io-patch/socket_patch.dart 2880:41                                       _Socket._onData
+dart:async/zone.dart 1778:10                                                  _RootZone.runUnaryGuarded
+dart:async/stream_impl.dart 381:11                                            _BufferingStreamSubscription._sendData
+dart:async/stream_impl.dart 312:7                                             _BufferingStreamSubscription._add
+dart:async/stream_controller.dart 798:19                                      _SyncStreamControllerDispatch._sendData
+dart:async/stream_controller.dart 663:7                                       _StreamController._add
+dart:async/stream_controller.dart 618:5                                       _StreamController.add
+dart:io-patch/socket_patch.dart 2315:31                                       new _RawSocket.<fn>
+dart:io-patch/socket_patch.dart 1655:14                                       _NativeSocket.issueReadEvent.issue
+dart:async/schedule_microtask.dart 40:35                                      _microtaskLoop
+dart:async/schedule_microtask.dart 49:5                                       _startMicrotaskLoop
+
+00:02 +5 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart: TrainingRepository Edge Cases addActivity handles special characters and emojis [E]                         
+  [FakeFirestore/not-found] Some requested document was not found.
+  package:matlog/src/features/training_log/data/training_repository.dart 31:7  TrainingRepository.addActivity
+  
+
+To run this test again: /Users/josecolomina/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/josecolomina/Github/MatLogBJJ/test/unit/training_edge_cases_test.dart -p vm --plain-name 'TrainingRepository Edge Cases addActivity handles special characters and emojis'
+00:02 +5 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository incrementRepetitions creates new technique if not exists                      
+DEBUG: incrementRepetitions for armbar_guard, amount: 5
+DEBUG: snapshot exists: false
+DEBUG: Creating new technique
+00:02 +6 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository incrementRepetitions creates new technique if not exists                      00:02 +6 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository incrementRepetitions updates existing technique                               00:02 +6 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository incrementRepetitions updates existing technique                               
+DEBUG: incrementRepetitions for armbar_guard, amount: 10
+DEBUG: snapshot exists: false
+DEBUG: Creating new technique
+DEBUG: incrementRepetitions for armbar_guard, amount: 5
+DEBUG: snapshot exists: true
+DEBUG: Updating existing technique
+00:02 +7 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository incrementRepetitions updates existing technique                               00:02 +7 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository getTechnique returns correct technique                                        00:02 +7 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository getTechnique returns correct technique                                        
+DEBUG: incrementRepetitions for triangle_mount, amount: 1
+DEBUG: snapshot exists: false
+DEBUG: Creating new technique
+00:02 +8 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository getTechnique returns correct technique                                        00:02 +8 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository updateTechnique updates notes                                                 00:02 +8 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository updateTechnique updates notes                                                 
+DEBUG: incrementRepetitions for sweep_half_guard, amount: 1
+DEBUG: snapshot exists: false
+DEBUG: Creating new technique
+00:02 +9 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_repository_test.dart: FirestoreTechniqueRepository updateTechnique updates notes                                                 00:02 +9 -3: loading /Users/josecolomina/Github/MatLogBJJ/test/unit/training_repository_test.dart                                                                                                      00:02 +9 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_repository_test.dart: TrainingRepository addActivity adds document to firestore                                                   00:02 +9 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_repository_test.dart: TrainingRepository addActivity adds document to firestore                                                   
+DEBUG: Attempting to add activity: test_activity_id
+DEBUG: Activity added successfully
+00:03 +10 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_repository_test.dart: TrainingRepository addActivity adds document to firestore                                                  00:03 +10 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_repository_test.dart: TrainingRepository getActivities returns stream of activities                                              00:03 +10 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_repository_test.dart: TrainingRepository getActivities returns stream of activities                                              
+DEBUG: Attempting to add activity: test_activity_id
+DEBUG: Activity added successfully
+00:03 +11 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/training_repository_test.dart: TrainingRepository getActivities returns stream of activities                                              00:03 +11 -3: loading /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_extraction_service_test.dart                                                                                            00:03 +11 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_extraction_service_test.dart: TechniqueExtractionService processTechnicalLog increments repetitions correctly for drill         00:03 +12 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_extraction_service_test.dart: TechniqueExtractionService processTechnicalLog increments repetitions correctly for drill         00:03 +12 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_extraction_service_test.dart: TechniqueExtractionService processTechnicalLog increments repetitions correctly for sparring      00:03 +13 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_extraction_service_test.dart: TechniqueExtractionService processTechnicalLog increments repetitions correctly for sparring      00:03 +13 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_extraction_service_test.dart: TechniqueExtractionService processTechnicalLog returns leveled up techniques                      00:03 +14 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/technique_extraction_service_test.dart: TechniqueExtractionService processTechnicalLog returns leveled up techniques                      00:03 +14 -3: loading /Users/josecolomina/Github/MatLogBJJ/test/unit/auth_edge_cases_test.dart                                                                                                         00:03 +14 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/auth_edge_cases_test.dart: AuthRepository Edge Cases signInWithEmailAndPassword throws on network error                                   00:03 +15 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/auth_edge_cases_test.dart: AuthRepository Edge Cases signInWithEmailAndPassword throws on network error                                   00:03 +15 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/auth_edge_cases_test.dart: AuthRepository Edge Cases createUserWithEmailAndPassword throws on network error                               00:03 +16 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/auth_edge_cases_test.dart: AuthRepository Edge Cases createUserWithEmailAndPassword throws on network error                               00:03 +16 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/auth_edge_cases_test.dart: AuthRepository Edge Cases signInWithEmailAndPassword handles extremely long email                              00:03 +17 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/auth_edge_cases_test.dart: AuthRepository Edge Cases signInWithEmailAndPassword handles extremely long email                              00:03 +17 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/auth_edge_cases_test.dart: AuthRepository Edge Cases createUserWithEmailAndPassword handles special characters in email                   00:03 +18 -3: /Users/josecolomina/Github/MatLogBJJ/test/unit/auth_edge_cases_test.dart: AuthRepository Edge Cases createUserWithEmailAndPassword handles special characters in email                   00:03 +18 -3: loading /Users/josecolomina/Github/MatLogBJJ/test/widget/home_screen_test.dart                                                                                                           00:03 +18 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/home_screen_test.dart: HomeScreen renders correctly with user data                                                                      00:04 +18 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/home_screen_test.dart: HomeScreen renders correctly with user data                                                                      00:04 +19 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/home_screen_test.dart: HomeScreen renders correctly with user data                                                                      00:04 +20 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/home_screen_test.dart: HomeScreen renders correctly with user data                                                                      00:04 +21 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/technique_library_screen_test.dart: TechniqueLibraryScreen displays techniques                                                          00:04 +22 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/technique_detail_screen_test.dart: TechniqueDetailScreen displays details and allows editing notes                                      00:04 +23 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/technique_detail_screen_test.dart: TechniqueDetailScreen displays details and allows editing notes                                      00:05 +23 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/technique_detail_screen_test.dart: TechniqueDetailScreen displays details and allows editing notes                                      00:05 +24 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/check_in_screen_test.dart: CheckInScreen renders and submits form                                                                       00:05 +25 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/check_in_screen_test.dart: CheckInScreen renders and submits form                                                                       00:05 +26 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/check_in_screen_test.dart: CheckInScreen renders and submits form                                                                       00:06 +26 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/check_in_screen_test.dart: CheckInScreen renders and submits form                                                                       00:06 +27 -3: /Users/josecolomina/Github/MatLogBJJ/test/widget/check_in_screen_test.dart: CheckInScreen renders and submits form                                                                       00:06 +27 -3: Some tests failed.                                                                                                                                                                       

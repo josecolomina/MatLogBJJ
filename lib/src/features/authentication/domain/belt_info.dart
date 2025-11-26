@@ -45,7 +45,7 @@ class BeltInfo {
   const BeltInfo({
     required this.color,
     required this.stripes,
-  }) : assert(stripes >= 0 && stripes <= 4, 'Stripes must be between 0 and 4');
+  }) : assert(stripes >= 0 && stripes <= 9, 'Stripes must be between 0 and 9');
 
   Map<String, dynamic> toMap() {
     return {

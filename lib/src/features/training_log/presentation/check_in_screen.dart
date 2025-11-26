@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:matlog/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
@@ -6,6 +7,9 @@ import '../../authentication/data/auth_repository.dart';
 import '../data/training_repository.dart';
 import '../domain/activity.dart';
 import '../domain/technical_log.dart';
+import '../../../services/gemini_service.dart';
+import '../../technique_library/domain/technique_extraction_service.dart';
+import '../../technique_library/presentation/level_up_dialog.dart';
 
 class CheckInScreen extends ConsumerStatefulWidget {
   const CheckInScreen({super.key});
@@ -40,23 +44,7 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
         final now = DateTime.now();
         final hasNotes = _notesController.text.isNotEmpty;
 
-        if (hasNotes) {
-          // AI processing disabled for now
-          // final result = await ref.read(geminiServiceProvider).processTechnicalNote(_notesController.text);
-          
-          final logId = const Uuid().v4();
-          final technicalLog = TechnicalLog(
-            logId: logId,
-            activityRef: activityId,
-            rawInputText: _notesController.text,
-            processedTechniques: [], // No AI processing
-            aiSummary: '', // No AI summary
-            createdAt: now,
-          );
-
-          await ref.read(trainingRepositoryProvider).addTechnicalLog(user.uid, technicalLog);
-        }
-
+        // Create Activity first
         final activity = Activity(
           activityId: activityId,
           userId: user.uid,
@@ -73,16 +61,67 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
 
         await ref.read(trainingRepositoryProvider).addActivity(activity);
 
+        if (hasNotes) {
+          // AI processing
+          final geminiService = ref.read(geminiServiceProvider);
+          final extractionService = ref.read(techniqueExtractionServiceProvider);
+          
+          Map<String, dynamic> aiResult = {'summary': '', 'techniques': []};
+          try {
+             aiResult = await geminiService.processTechnicalNote(_notesController.text);
+          } catch (e) {
+            print('AI Processing failed: $e');
+            // Continue without AI data if it fails, or show error? 
+            // For now, let's continue with empty techniques to not block saving.
+          }
+
+          final techniquesList = (aiResult['techniques'] as List? ?? []).map((t) {
+            return ProcessedTechnique(
+              techniqueName: t['name'] ?? 'Unknown',
+              category: t['type'] ?? 'Drill',
+              positionStart: t['position_start'] ?? 'Unknown',
+              positionEnd: t['position_end'] ?? 'Unknown',
+              tags: [],
+              masteryLevel: 0, // Initial level
+            );
+          }).toList();
+          
+          final logId = const Uuid().v4();
+          final technicalLog = TechnicalLog(
+            logId: logId,
+            activityRef: activityId,
+            rawInputText: _notesController.text,
+            processedTechniques: techniquesList,
+            aiSummary: aiResult['summary'] ?? '',
+            createdAt: now,
+          );
+
+          await ref.read(trainingRepositoryProvider).addTechnicalLog(user.uid, technicalLog);
+          
+          // Update Technique Library
+          final leveledUpTechniques = await extractionService.processTechnicalLog(technicalLog, activity);
+          
+          if (mounted && leveledUpTechniques.isNotEmpty) {
+             // Show level up dialogs sequentially or just the first one for now
+             for (final technique in leveledUpTechniques) {
+               await showDialog(
+                 context: context,
+                 builder: (context) => LevelUpDialog(technique: technique),
+               );
+             }
+          }
+        }
+
         if (mounted) {
           context.pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Training logged successfully!')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.trainingLogged)),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.toString()}')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.errorLabel(e.toString()))),
           );
         }
       } finally {
@@ -94,28 +133,52 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Check-in')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.checkInTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
-              DropdownButtonFormField<String>(
-                value: _selectedType,
-                items: ['gi', 'nogi', 'open_mat', 'seminar']
-                    .map((type) => DropdownMenuItem(
-                          value: type,
-                          child: Text(type.toUpperCase()),
-                        ))
-                    .toList(),
-                onChanged: (value) => setState(() => _selectedType = value!),
-                decoration: const InputDecoration(labelText: 'Type'),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 5,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedType,
+                    isExpanded: true,
+                    icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF1565C0)),
+                    items: ['Gi', 'Nogi', 'Open mat', 'Seminario']
+                        .map((type) => DropdownMenuItem(
+                              value: type.toLowerCase().replaceAll(' ', '_'),
+                              child: Text(
+                                type,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (value) => setState(() => _selectedType = value!),
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _durationController,
-                decoration: const InputDecoration(labelText: 'Duration (minutes)'),
+                decoration: InputDecoration(labelText: '${AppLocalizations.of(context)!.durationLabel} (min)'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Required';
@@ -124,7 +187,7 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              Text('RPE (Intensity): ${_rpe.round()}'),
+              Text('${AppLocalizations.of(context)!.rpeLabel}: ${_rpe.round()}'),
               Slider(
                 value: _rpe,
                 min: 1,
@@ -136,10 +199,10 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
               const SizedBox(height: 24),
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(
-                  labelText: 'What did you learn today?',
-                  hintText: 'Describe techniques, drills, or sparring notes...',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.trainingNotes,
+                  hintText: '...',
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 5,
               ),
@@ -148,7 +211,7 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(
                       onPressed: _submit,
-                      child: const Text('Save Training'),
+                      child: Text(AppLocalizations.of(context)!.saveLabel),
                     ),
             ],
           ),

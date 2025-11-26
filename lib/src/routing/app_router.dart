@@ -9,6 +9,8 @@ import '../features/dashboard/presentation/home_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/training_log/presentation/check_in_screen.dart';
 import '../features/social_rivals/presentation/rivals_screen.dart';
+import '../features/technique_library/presentation/technique_library_screen.dart';
+import '../features/technique_library/presentation/technique_detail_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
@@ -65,6 +67,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/rivals',
         builder: (context, state) => const RivalsScreen(),
+      ),
+      GoRoute(
+        path: '/techniques',
+        builder: (context, state) => const TechniqueLibraryScreen(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return TechniqueDetailScreen(techniqueId: id);
+            },
+          ),
+        ],
       ),
     ],
   );

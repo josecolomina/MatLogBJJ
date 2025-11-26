@@ -19,7 +19,29 @@ class RivalsRepository {
             .toList());
   }
 
-  Future<void> addMatchResult(String userId, String rivalId, String rivalName, String result) async {
+  Future<void> addRival(String userId, String rivalName) async {
+    final rivalId = rivalName.toLowerCase().replaceAll(' ', '_');
+    final rivalRef = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('rivals')
+        .doc(rivalId);
+
+    final snapshot = await rivalRef.get();
+    if (!snapshot.exists) {
+      await rivalRef.set({
+        'rivalUid': rivalId,
+        'rivalName': rivalName,
+        'wins': 0,
+        'losses': 0,
+        'draws': 0,
+        'lastRolledAt': FieldValue.serverTimestamp(),
+        'notes': '',
+      });
+    }
+  }
+
+  Future<void> logMatch(String userId, String rivalId, String result) async {
     final rivalRef = _firestore
         .collection('users')
         .doc(userId)
@@ -30,15 +52,9 @@ class RivalsRepository {
       final snapshot = await transaction.get(rivalRef);
 
       if (!snapshot.exists) {
-        transaction.set(rivalRef, {
-          'rivalUid': rivalId,
-          'rivalName': rivalName,
-          'wins': result == 'win' ? 1 : 0,
-          'losses': result == 'loss' ? 1 : 0,
-          'draws': result == 'draw' ? 1 : 0,
-          'lastRolledAt': FieldValue.serverTimestamp(),
-          'notes': '',
-        });
+        // Should not happen if we are logging a match against an existing rival
+        // But we can handle it or throw
+        return; 
       } else {
         final data = snapshot.data()!;
         int wins = data['wins'] ?? 0;
@@ -62,4 +78,8 @@ class RivalsRepository {
 
 final rivalsRepositoryProvider = Provider<RivalsRepository>((ref) {
   return RivalsRepository(FirebaseFirestore.instance);
+});
+
+final rivalsStreamProvider = StreamProvider.family<List<Rival>, String>((ref, userId) {
+  return ref.watch(rivalsRepositoryProvider).getRivals(userId);
 });

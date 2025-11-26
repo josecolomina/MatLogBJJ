@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:matlog/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matlog/src/features/settings/presentation/settings_screen.dart';
@@ -6,6 +7,8 @@ import '../../authentication/data/auth_repository.dart';
 import '../../social_rivals/presentation/feed_screen.dart';
 import '../../subscription/presentation/ad_banner_widget.dart';
 import 'package:matlog/src/common_widgets/belt_display_widget.dart';
+import 'package:matlog/src/common_widgets/profile_image_widget.dart';
+import '../../authentication/domain/belt_info.dart';
 import '../../profile/data/profile_repository.dart';
 import 'dashboard_controller.dart';
 
@@ -30,16 +33,16 @@ class HomeScreen extends ConsumerWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'MatLog',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              AppLocalizations.of(context)!.appTitle,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             ref.watch(userBeltInfoProvider).when(
                   data: (belt) => BeltDisplayWidget(
                     beltInfo: belt,
                     height: 32,
-                    width: 120,
+                    width: 100,
                   ),
                   loading: () => const SizedBox.shrink(),
                   error: (_, _) => const SizedBox.shrink(),
@@ -48,12 +51,35 @@ class HomeScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.account_circle),
-            onPressed: () {
+            icon: const Icon(Icons.library_books),
+            tooltip: 'Technique Library',
+            onPressed: () => context.push('/techniques'),
+          ),
+          GestureDetector(
+            onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => const SettingsScreen()),
               );
             },
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: ref.watch(userProfileProvider).when(
+                    data: (snapshot) {
+                      final data = snapshot.data() as Map<String, dynamic>?;
+                      final beltMap = data?['belt_info'] as Map<String, dynamic>?;
+                      final beltInfo = beltMap != null ? BeltInfo.fromMap(beltMap) : null;
+                      final photoUrl = data?['photoUrl'] as String?; // Assuming photoUrl field exists or will exist
+
+                      return ProfileImageWidget(
+                        radius: 18,
+                        beltInfo: beltInfo,
+                        photoUrl: photoUrl,
+                      );
+                    },
+                    loading: () => const CircleAvatar(radius: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                    error: (_, __) => const Icon(Icons.account_circle),
+                  ),
+            ),
           ),
         ],
       ),
@@ -82,66 +108,67 @@ class HomeScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Objetivo Semanal',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Colors.grey[600],
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
-                            Icon(Icons.flag_outlined, color: Theme.of(context).primaryColor),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '$progress',
-                              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 6, left: 4),
-                              child: Text(
-                                '/ $target sesiones',
-                                style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: LinearProgressIndicator(
-                            value: percent,
-                            minHeight: 8,
-                            backgroundColor: Colors.grey[100],
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Theme.of(context).primaryColor,
-                            ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.weeklyGoal,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w600,
                           ),
-                        ),
-                      ],
+                    ),
+                    Icon(Icons.flag_outlined, color: Theme.of(context).primaryColor),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '$progress',
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6, left: 4),
+                      child: Text(
+                        '/ $target ${AppLocalizations.of(context)!.sessions}',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: percent,
+                    minHeight: 8,
+                    backgroundColor: Colors.grey[100],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor,
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
-                Text(
-                  'Actividad Reciente',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1565C0),
-                      ),
-                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        Text(
+          AppLocalizations.of(context)!.recentActivity,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF1565C0),
+              ),
+        ),
                 const SizedBox(height: 16),
                 const Expanded(child: FeedScreen()),
-                const AdBannerWidget(),
+                const SizedBox(height: 16), // Reduced padding since ads are gone
+                // const AdBannerWidget(), // Ads disabled for now
               ],
             ),
           );

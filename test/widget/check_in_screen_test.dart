@@ -8,6 +8,11 @@ import 'package:matlog/src/services/gemini_service.dart';
 import 'package:mockito/mockito.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:matlog/l10n/app_localizations.dart';
+
+import 'package:matlog/src/features/technique_library/domain/technique_extraction_service.dart';
+import 'package:matlog/src/features/technique_library/domain/technique.dart';
 
 class MockTrainingRepository extends Mock implements TrainingRepository {
   @override
@@ -17,7 +22,22 @@ class MockTrainingRepository extends Mock implements TrainingRepository {
   Future<void> addTechnicalLog(String userId, dynamic log) async {}
 }
 
-class MockGeminiService extends Mock implements GeminiService {}
+class MockGeminiService extends Mock implements GeminiService {
+  @override
+  Future<Map<String, dynamic>> processTechnicalNote(String text) async {
+    return {
+      'summary': 'Test summary',
+      'techniques': [],
+    };
+  }
+}
+
+class MockTechniqueExtractionService extends Mock implements TechniqueExtractionService {
+  @override
+  Future<List<Technique>> processTechnicalLog(dynamic log, dynamic activity) async {
+    return [];
+  }
+}
 
 class MockAuthRepository extends Mock implements AuthRepository {
   @override
@@ -32,12 +52,11 @@ class MockUser extends Mock implements User {
   String? get displayName => 'Test User';
 }
 
-
-
 void main() {
   testWidgets('CheckInScreen renders and submits form', (WidgetTester tester) async {
     final mockTrainingRepository = MockTrainingRepository();
     final mockGeminiService = MockGeminiService();
+    final mockExtractionService = MockTechniqueExtractionService();
     final mockAuthRepository = MockAuthRepository();
 
     final router = GoRouter(
@@ -62,26 +81,30 @@ void main() {
           authRepositoryProvider.overrideWithValue(mockAuthRepository),
           trainingRepositoryProvider.overrideWithValue(mockTrainingRepository),
           geminiServiceProvider.overrideWithValue(mockGeminiService),
+          techniqueExtractionServiceProvider.overrideWithValue(mockExtractionService),
         ],
         child: MaterialApp.router(
           routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
         ),
       ),
     );
 
     // Verify fields
     expect(find.text('Check-in'), findsOneWidget);
-    expect(find.text('Type'), findsOneWidget);
-    expect(find.text('Duration (minutes)'), findsOneWidget);
+    // expect(find.text('Type'), findsOneWidget); // Label removed in custom dropdown
+    expect(find.text('Gi'), findsOneWidget); // Default value displayed
+    expect(find.text('Duration (min)'), findsOneWidget);
     expect(find.text('RPE (Intensity): 5'), findsOneWidget);
-    expect(find.text('What did you learn today?'), findsOneWidget);
+    expect(find.text('Training Notes'), findsOneWidget);
 
     // Enter data
     await tester.enterText(find.byType(TextFormField).at(0), '90'); // Duration
     await tester.enterText(find.byType(TextFormField).at(1), 'Learned armbar'); // Notes
 
     // Tap Save
-    await tester.tap(find.text('Save Training'));
+    await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
     // Verify success snackbar

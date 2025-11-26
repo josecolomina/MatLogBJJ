@@ -48,19 +48,30 @@ class BeltDisplayWidget extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 2),
             child: beltInfo.stripes > 0
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(beltInfo.stripes, (index) {
-                      return Flexible(
-                        child: Container(
-                          width: 3,
-                          margin: const EdgeInsets.symmetric(horizontal: 0.5),
-                          height: height * 0.7,
-                          color: Colors.white,
+                ? (beltInfo.stripes > 4
+                    ? Center(
+                        child: Text(
+                          '${beltInfo.stripes}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                         ),
-                      );
-                    }),
-                  )
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(beltInfo.stripes, (index) {
+                          return Flexible(
+                            child: Container(
+                              width: 3,
+                              margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                              height: height * 0.7,
+                              color: Colors.white,
+                            ),
+                          );
+                        }),
+                      ))
                 : const SizedBox.shrink(),
           ),
         ],

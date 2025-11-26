@@ -7,6 +7,8 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:matlog/src/features/training_log/data/training_repository.dart';
 import 'package:matlog/src/features/training_log/domain/activity.dart';
 import 'package:mockito/mockito.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:matlog/l10n/app_localizations.dart';
 
 class MockTrainingRepository extends Mock implements TrainingRepository {
   @override
@@ -33,6 +35,8 @@ void main() {
           trainingRepositoryProvider.overrideWithValue(mockTrainingRepository),
         ],
         child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: HomeScreen(),
         ),
       ),
@@ -44,17 +48,12 @@ void main() {
     // Verify Title
     expect(find.text('MatLog'), findsOneWidget);
     
-    // Verify Splash Text (It's random, so we just check for any text in that style or position, 
-    // but since we can't easily predict the text, we check if a Column in AppBar contains it)
-    // A better way is to check if there is a text widget with italic style below MatLog.
-    // For now, let's just check MatLog is there.
-
     // Verify Weekly Goal
-    expect(find.text('Objetivo Semanal'), findsOneWidget);
+    expect(find.text('Weekly Goal'), findsOneWidget);
     expect(find.text('2'), findsOneWidget);
-    expect(find.text('/ 4 sesiones'), findsOneWidget);
+    expect(find.text('/ 4 sessions'), findsOneWidget);
 
     // Verify Feed Section
-    expect(find.text('Actividad Reciente'), findsOneWidget);
+    expect(find.text('Recent Activity'), findsOneWidget);
   });
 }

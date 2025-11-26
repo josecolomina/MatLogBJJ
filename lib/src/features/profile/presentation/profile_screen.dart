@@ -8,6 +8,8 @@ import '../../notifications/data/notification_service.dart';
 import '../../dashboard/presentation/dashboard_controller.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:matlog/src/common_widgets/profile_image_widget.dart';
+import 'package:matlog/l10n/app_localizations.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -39,9 +41,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         // TODO: Upload to Firebase Storage in future
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al seleccionar imagen: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.imageSelectionError(e.toString()))),
         );
       }
     }
@@ -54,7 +56,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi Perfil'),
+        title: Text(AppLocalizations.of(context)!.profileTitle),
       ),
       body: userProfileAsync.when(
         data: (snapshot) {
@@ -77,127 +79,61 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             onTap: _pickImage,
                             child: Stack(
                               children: [
-                                CircleAvatar(
+                                ProfileImageWidget(
                                   radius: 60,
-                                  backgroundColor: const Color(0xFFE0E0E0),
-                                  backgroundImage: _profileImage != null 
-                                      ? FileImage(_profileImage!) 
-                                      : null,
-                                  child: _profileImage == null
-                                      ? const Icon(Icons.person, size: 70, color: Colors.grey)
-                                      : null,
+                                  imageFile: _profileImage,
+                                  photoUrl: null, // We prioritize imageFile if set, otherwise we could pass the URL from profile data if we had it here
+                                  beltInfo: BeltInfo(color: _selectedBelt!, stripes: _selectedStripes!),
                                 ),
                                 Positioned(
                                   right: 0,
-                                  bottom: 0,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF1565C0),
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black26,
-                                          blurRadius: 4,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(
-                                      Icons.camera_alt,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                  ),
+                                  child: const Icon(Icons.cloud_upload_outlined, color: Color(0xFF1565C0)),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 24),
-                          const Text(
-                            'Tu Cinturón Actual',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey,
-                            ),
-                          ),
                           const SizedBox(height: 12),
-                          BeltDisplayWidget(
-                            beltInfo: BeltInfo(
-                              color: _selectedBelt!,
-                              stripes: _selectedStripes!,
-                            ),
-                            height: 60,
-                            width: 280,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.cloud_upload_outlined, color: Color(0xFF1565C0), size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                AppLocalizations.of(context)!.saveProgress,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1565C0),
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '${_selectedBelt!.displayName} - $_selectedStripes ${_selectedStripes == 1 ? "grado" : "grados"}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
+                            AppLocalizations.of(context)!.linkAccountDesc,
+                            style: const TextStyle(fontSize: 14, color: Colors.black87),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () => _showLinkAccountDialog(context, ref),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1565C0),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                              ),
+                              child: Text(AppLocalizations.of(context)!.linkEmail),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    if (ref.read(authRepositoryProvider).currentUser?.isAnonymous ?? false)
-                      Card(
-                        margin: const EdgeInsets.only(bottom: 32),
-                        elevation: 0,
-                        color: Colors.blue.shade50,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: Colors.blue.shade100),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Row(
-                                children: [
-                                  Icon(Icons.cloud_upload_outlined, color: Color(0xFF1565C0)),
-                                  SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      'Guarda tu progreso',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF1565C0),
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'Asocia tu cuenta a un correo electrónico para no perder tus datos si cambias de dispositivo.',
-                                style: TextStyle(fontSize: 14, color: Colors.black87),
-                              ),
-                              const SizedBox(height: 16),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () => _showLinkAccountDialog(context, ref),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF1565C0),
-                                    foregroundColor: Colors.white,
-                                    elevation: 0,
-                                  ),
-                                  child: const Text('Vincular Correo'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Editar Progreso',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    const SizedBox(height: 32),
+                    Text(
+                      AppLocalizations.of(context)!.editProgress,
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 24),
                     Container(
@@ -215,7 +151,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       child: DropdownButtonFormField<BeltColor>(
                         value: _selectedBelt,
                         decoration: InputDecoration(
-                          labelText: 'Cinturón',
+                          labelText: AppLocalizations.of(context)!.belt,
                           labelStyle: const TextStyle(
                             color: Color(0xFF1565C0),
                             fontWeight: FontWeight.w600,
@@ -269,7 +205,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       child: DropdownButtonFormField<int>(
                         value: _selectedStripes,
                         decoration: InputDecoration(
-                          labelText: 'Grados',
+                          labelText: AppLocalizations.of(context)!.stripes,
                           labelStyle: const TextStyle(
                             color: Color(0xFF1565C0),
                             fontWeight: FontWeight.w600,
@@ -290,7 +226,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             vertical: 20,
                           ),
                         ),
-                        items: List.generate(5, (index) {
+                        items: List.generate(10, (index) {
                           return DropdownMenuItem(
                             value: index,
                             child: Text(
@@ -338,9 +274,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                 ),
-                                child: const Text(
-                                  'Guardar Cambios',
-                                  style: TextStyle(
+                                child: Text(
+                                  AppLocalizations.of(context)!.saveChanges,
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -350,9 +286,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ),
                     ),
                     const SizedBox(height: 32),
-                    const Text(
-                      'Notificaciones y Horarios',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    Text(
+                      AppLocalizations.of(context)!.notificationsSchedule,
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
                     _buildScheduleSection(context, ref, data),
@@ -383,9 +319,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Días de entrenamiento',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+        Text(
+          AppLocalizations.of(context)!.trainingDays,
+          style: const TextStyle(fontSize: 16, color: Colors.grey),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -418,7 +354,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         const SizedBox(height: 16),
         ListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('Hora habitual de clase'),
+          title: Text(AppLocalizations.of(context)!.usualTime),
           subtitle: Text(trainingTime.format(context)),
           trailing: const Icon(Icons.edit),
           onTap: () async {
@@ -464,13 +400,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         );
       }
 
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Horario actualizado')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.scheduleUpdated)),
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );
@@ -486,20 +422,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       await ref.read(profileRepositoryProvider).updateBeltInfo(
             BeltInfo(color: _selectedBelt!, stripes: _selectedStripes!),
           );
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Perfil actualizado correctamente')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.profileUpdated)),
         );
         Navigator.of(context).pop();
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al actualizar: $e')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.updateError(e.toString()))),
         );
       }
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (context.mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -513,7 +449,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('Asegurar Cuenta'),
+          title: Text(AppLocalizations.of(context)!.secureAccount),
           content: Form(
             key: formKey,
             child: Column(
@@ -539,7 +475,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
+              child: Text(AppLocalizations.of(context)!.cancelLabel),
             ),
             isLinking
                 ? const CircularProgressIndicator()
@@ -557,8 +493,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           if (context.mounted) {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('¡Cuenta asegurada con éxito!'),
+                              SnackBar(
+                                content: Text(AppLocalizations.of(context)!.accountSecured),
                                 backgroundColor: Colors.green,
                               ),
                             );
@@ -575,7 +511,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         }
                       }
                     },
-                    child: const Text('Vincular'),
+                    child: Text(AppLocalizations.of(context)!.linkButton),
                   ),
           ],
         ),

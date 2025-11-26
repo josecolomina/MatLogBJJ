@@ -1,0 +1,133 @@
+{
+  "appTitle": "MatLog",
+  "weeklyGoal": "Meta Semanal",
+  "sessions": "sessões",
+  "recentActivity": "Atividade Recente",
+  "profileTitle": "Meu Perfil",
+  "currentBelt": "Faixa Atual",
+  "degree": "grau",
+  "degrees": "graus",
+  "editProgress": "Editar Progresso",
+  "belt": "Faixa",
+  "stripes": "Graus",
+  "saveChanges": "Salvar Alterações",
+  "notificationsSchedule": "Notificações e Horários",
+  "trainingDays": "Dias de Treino",
+  "usualTime": "Horário Habitual",
+  "linkEmail": "Vincular Email",
+  "secureAccount": "Proteger Conta",
+  "pleaseLogin": "Por favor faça login",
+  "errorLabel": "Erro: {error}",
+  "@errorLabel": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "matchResultQuestion": "Qual foi o resultado do treino?",
+  "addedRivalMessage": "{name} adicionado aos seus rivais",
+  "@addedRivalMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSelectionError": "Erro ao selecionar imagem: {error}",
+  "@imageSelectionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleUpdated": "Horário atualizado",
+  "profileUpdated": "Perfil atualizado com sucesso",
+  "updateError": "Erro ao atualizar: {error}",
+  "@updateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSecured": "Conta protegida com sucesso!",
+  "linkButton": "Vincular",
+  "trainingLogged": "Treino registrado com sucesso!",
+  "rpeLabel": "RPE (Intensidade)",
+  "saveProgress": "Salve seu progresso",
+  "linkAccountDesc": "Vincule sua conta a um email para não perder seus dados se trocar de dispositivo.",
+  "rivalsTitle": "Parceiros de Treino",
+  "noRivals": "Nenhum parceiro salvo ainda.",
+  "addRival": "Adicionar",
+  "newRivalTitle": "Novo Parceiro",
+  "nameLabel": "Nome",
+  "saveLabel": "Salvar",
+  "cancelLabel": "Cancelar",
+  "matchVs": "Luta vs",
+  "winLabel": "Vitória",
+  "lossLabel": "Derrota",
+  "drawLabel": "Empate",
+  "techniqueLibraryTitle": "Biblioteca Técnica",
+  "noTechniques": "Nenhuma técnica aprendida ainda.",
+  "repetitionsLabel": "Repetições",
+  "levelLabel": "Nível",
+  "techniqueDetailTitle": "Detalhes da Técnica",
+  "notesLabel": "Notas",
+  "saveNotes": "Salvar Notas",
+  "historyLabel": "Histórico",
+  "checkInTitle": "Check-in",
+  "sessionType": "Tipo de Sessão",
+  "durationLabel": "Duração",
+  "trainingNotes": "Notas de Treino",
+  "settingsTitle": "Configurações",
+  "accountSection": "Conta",
+  "manageSubscription": "Gerenciar Assinatura",
+  "signOut": "Sair",
+  "deleteAccount": "Excluir Conta",
+  "aboutSection": "Sobre",
+  "privacyPolicy": "Política de Privacidade",
+  "termsOfService": "Termos de Serviço",
+  "versionLabel": "Versão",
+  "pleaseLogin": "Por favor faça login",
+  "errorLabel": "Erro: {error}",
+  "@errorLabel": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "matchResultQuestion": "Qual foi o resultado do treino?",
+  "addedRivalMessage": "{name} adicionado aos seus rivais",
+  "@addedRivalMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imageSelectionError": "Erro ao selecionar imagem: {error}",
+  "@imageSelectionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleUpdated": "Horário atualizado",
+  "profileUpdated": "Perfil atualizado com sucesso",
+  "updateError": "Erro ao atualizar: {error}",
+  "@updateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountSecured": "Conta protegida com sucesso!",
+  "linkButton": "Vincular",
+  "trainingLogged": "Treino registrado com sucesso!",
+  "rpeLabel": "RPE (Intensidade)"
+}
