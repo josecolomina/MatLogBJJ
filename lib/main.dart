@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'src/routing/app_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'src/features/subscription/data/revenue_cat_provider.dart';
 // import 'firebase_options.dart'; // TODO: Uncomment when firebase_options.dart is generated
 
 void main() async {
@@ -11,6 +12,7 @@ void main() async {
   print('FIREBASE DEBUG: API Key: ${Firebase.app().options.apiKey}');
   print('FIREBASE DEBUG: Project ID: ${Firebase.app().options.projectId}');
   print('FIREBASE DEBUG: App ID: ${Firebase.app().options.appId}');
+  await RevenueCatService().init();
   await initializeDateFormatting('es', null);
   //   options: DefaultFirebaseOptions.currentPlatform,
   // );

@@ -41,6 +41,15 @@ class TrainingRepository {
             .map((doc) => Activity.fromJson(doc.data()))
             .toList());
   }
+
+  Future<List<Map<String, dynamic>>> getUserActivitiesJson(String userId) async {
+    final snapshot = await _firestore
+        .collection('activities')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
 }
 
 final firestoreProvider = Provider<FirebaseFirestore>((ref) {

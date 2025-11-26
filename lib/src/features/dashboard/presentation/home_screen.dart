@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:matlog/src/features/settings/presentation/settings_screen.dart';
 import '../../authentication/data/auth_repository.dart';
 import '../../social_rivals/presentation/feed_screen.dart';
+import '../../subscription/presentation/ad_banner_widget.dart';
 import 'dashboard_controller.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -43,9 +45,11 @@ class HomeScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.account_circle),
             onPressed: () {
-              ref.read(authRepositoryProvider).signOut();
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
             },
           ),
         ],
@@ -134,6 +138,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
                 const Expanded(child: FeedScreen()),
+                const AdBannerWidget(),
               ],
             ),
           );
