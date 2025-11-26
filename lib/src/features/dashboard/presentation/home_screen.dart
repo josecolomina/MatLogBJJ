@@ -11,6 +11,9 @@ import 'package:matlog/src/common_widgets/profile_image_widget.dart';
 import '../../authentication/domain/belt_info.dart';
 import '../../profile/data/profile_repository.dart';
 import 'dashboard_controller.dart';
+import '../../missions/data/mission_repository.dart';
+import '../../missions/presentation/missions_modal.dart';
+import '../../tutorial/data/tutorial_repository.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -21,15 +24,9 @@ class HomeScreen extends ConsumerWidget {
 
     // Check weekly goal on load
     ref.listen(dashboardControllerProvider, (_, __) {});
-    // Trigger check (this is a bit hacky for a build method, better in init state or provider)
-    // For MVP, we'll rely on the provider watching the stream or manual trigger
     
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.people_outline),
-          onPressed: () => context.push('/rivals'),
-        ),
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -50,10 +47,27 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          // DEBUG: Reset Tutorial Button
           IconButton(
-            icon: const Icon(Icons.library_books),
-            tooltip: 'Technique Library',
-            onPressed: () => context.push('/techniques'),
+            icon: const Icon(Icons.refresh, color: Colors.orange),
+            tooltip: 'DEBUG: Reset Tutorial',
+            onPressed: () async {
+              // Reset tutorial
+              await ref.read(tutorialRepositoryProvider).resetTutorial();
+              
+              // Sign out to test tutorial again
+              await ref.read(authRepositoryProvider).signOut();
+              
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Tutorial reseteado. Redirigiendo a onboarding...'),
+                    backgroundColor: Colors.orange,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
           ),
           GestureDetector(
             onTap: () {
@@ -86,85 +100,23 @@ class HomeScreen extends ConsumerWidget {
       body: userProfileAsync.when(
         data: (snapshot) {
           if (!snapshot.exists) return const Center(child: Text('Perfil de usuario no encontrado'));
-          final data = snapshot.data() as Map<String, dynamic>;
-          final progress = data['weekly_goal_progress'] as int? ?? 0;
-          final target = data['weekly_goal_target'] as int? ?? 3;
-          final percent = (progress / target).clamp(0.0, 1.0);
-
+          
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Card(
-                  elevation: 0,
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: Colors.grey.shade200),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.weeklyGoal,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    Icon(Icons.flag_outlined, color: Theme.of(context).primaryColor),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '$progress',
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6, left: 4),
-                      child: Text(
-                        '/ $target ${AppLocalizations.of(context)!.sessions}',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                      ),
-                    ),
-                  ],
-                ),
+                const _MissionsCard(),
                 const SizedBox(height: 16),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: percent,
-                    minHeight: 8,
-                    backgroundColor: Colors.grey[100],
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).primaryColor,
-                    ),
-                  ),
+                const _UpcomingClassesCard(),
+                const SizedBox(height: 24),
+                Text(
+                  AppLocalizations.of(context)!.recentActivity,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1565C0),
+                      ),
                 ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 32),
-        Text(
-          AppLocalizations.of(context)!.recentActivity,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1565C0),
-              ),
-        ),
                 const SizedBox(height: 16),
                 const Expanded(child: FeedScreen()),
                 const SizedBox(height: 16), // Reduced padding since ads are gone
@@ -175,11 +127,6 @@ class HomeScreen extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/check-in'),
-        backgroundColor: const Color(0xFF1565C0),
-        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
@@ -203,3 +150,303 @@ class HomeScreen extends ConsumerWidget {
     return splashes[DateTime.now().microsecond % splashes.length];
   }
 }
+
+class _MissionsCard extends ConsumerWidget {
+  const _MissionsCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final missionsAsync = ref.watch(missionsStreamProvider);
+
+    return missionsAsync.when(
+      data: (missions) {
+        final hasNew = missions.any((m) => m.isNew && !m.isCompleted);
+        final allCompleted = missions.isNotEmpty && missions.every((m) => m.isCompleted);
+        final completedCount = missions.where((m) => m.isCompleted).length;
+        final totalCount = missions.length;
+
+        return GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => const MissionsModal(),
+            );
+          },
+          child: Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(
+                  colors: allCompleted 
+                    ? [Colors.green.shade50, Colors.green.shade100]
+                    : [const Color(0xFF1565C0).withOpacity(0.1), const Color(0xFF0D47A1).withOpacity(0.1)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: allCompleted ? Colors.green : const Color(0xFF1565C0),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      allCompleted ? Icons.check_circle : Icons.flag,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                'Misiones Semanales',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1565C0),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (hasNew)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Text(
+                                  'NUEVA',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '$completedCount de $totalCount completadas',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    color: Colors.grey[400],
+                    size: 28,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}
+
+class _UpcomingClassesCard extends ConsumerWidget {
+  const _UpcomingClassesCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userProfileAsync = ref.watch(userProfileStreamProvider);
+
+    return userProfileAsync.when(
+      data: (snapshot) {
+        if (!snapshot.exists) return const SizedBox.shrink();
+        
+        final data = snapshot.data() as Map<String, dynamic>;
+        final trainingDays = List<int>.from(data['training_days'] ?? []);
+        final trainingTime = data['training_time'] as String? ?? '18:00';
+        
+        if (trainingDays.isEmpty) return const SizedBox.shrink();
+
+        // Get next upcoming classes (max 3)
+        final upcoming = _getUpcomingClasses(trainingDays, trainingTime);
+        if (upcoming.isEmpty) return const SizedBox.shrink();
+
+        return Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1565C0).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.calendar_today,
+                        color: Color(0xFF1565C0),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Próximas Clases',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1565C0),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                ...upcoming.map((classInfo) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1565C0),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              classInfo['day']!,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              classInfo['time']!,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (classInfo['isToday'] == true)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Text(
+                            'HOY',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      if (classInfo['isTomorrow'] == true)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.orange,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Text(
+                            'MAÑANA',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                )).toList(),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  List<Map<String, dynamic>> _getUpcomingClasses(List<int> trainingDays, String time) {
+    final now = DateTime.now();
+    final today = now.weekday; // 1 = Monday, 7 = Sunday
+    final upcoming = <Map<String, dynamic>>[];
+
+    // Parse training time
+    final timeParts = time.split(':');
+    final classHour = int.parse(timeParts[0]);
+    final classMinute = int.parse(timeParts[1]);
+    
+    // Check if today's class has already passed
+    final todayClassTime = DateTime(now.year, now.month, now.day, classHour, classMinute);
+    final todayClassPassed = now.isAfter(todayClassTime);
+
+    // Sort training days
+    final sortedDays = List<int>.from(trainingDays)..sort();
+
+    // Find next 3 occurrences
+    int dayOffset = todayClassPassed ? 1 : 0; // Start from tomorrow if today's class passed
+    
+    for (int i = dayOffset; i < 7 && upcoming.length < 3; i++) {
+      final checkDay = ((today - 1 + i) % 7) + 1; // Convert to 1-7 range
+      if (sortedDays.contains(checkDay)) {
+        final isToday = i == 0 && !todayClassPassed;
+        final isTomorrow = i == 1 || (i == 0 && todayClassPassed);
+        
+        upcoming.add({
+          'day': _getDayName(checkDay),
+          'time': time,
+          'isToday': isToday,
+          'isTomorrow': isTomorrow && !isToday,
+        });
+      }
+    }
+
+    return upcoming;
+  }
+
+  String _getDayName(int day) {
+    const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    return days[day - 1];
+  }
+}
+

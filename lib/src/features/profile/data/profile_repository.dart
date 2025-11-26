@@ -24,6 +24,12 @@ class ProfileRepository {
       return BeltInfo.fromMap(data?['belt_info']);
     });
   }
+  
+  Stream<DocumentSnapshot> getUserProfile() {
+    final user = _auth.currentUser;
+    if (user == null) return const Stream.empty();
+    return _firestore.collection('users').doc(user.uid).snapshots();
+  }
 
   Future<void> updateBeltInfo(BeltInfo beltInfo) async {
     final user = _auth.currentUser;
@@ -31,6 +37,15 @@ class ProfileRepository {
 
     await _firestore.collection('users').doc(user.uid).update({
       'belt_info': beltInfo.toMap(),
+    });
+  }
+
+  Future<void> updateViewedMissions(List<String> missionIds) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    await _firestore.collection('users').doc(user.uid).update({
+      'viewed_missions': missionIds,
     });
   }
 
@@ -88,3 +103,8 @@ final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
 final userBeltInfoProvider = StreamProvider<BeltInfo>((ref) {
   return ref.watch(profileRepositoryProvider).watchUserBeltInfo();
 });
+
+final userProfileStreamProvider = StreamProvider((ref) {
+  return ref.watch(profileRepositoryProvider).getUserProfile();
+});
+

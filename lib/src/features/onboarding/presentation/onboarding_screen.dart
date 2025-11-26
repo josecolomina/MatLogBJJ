@@ -6,6 +6,8 @@ import '../../authentication/domain/belt_info.dart';
 import '../../profile/data/profile_repository.dart';
 
 import '../../notifications/data/notification_service.dart';
+import '../../tutorial/data/tutorial_repository.dart';
+import 'package:go_router/go_router.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -42,27 +44,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         if (userCredential.user != null) {
           final beltInfo = BeltInfo(color: _selectedBelt, stripes: _selectedStripes);
           
-          // We need to update the user document with name, academy, and belt
-          // Since we don't have a dedicated "updateProfile" method that takes all this in AuthRepository yet,
-          // we can use the ProfileRepository or direct Firestore access.
-          // For cleanliness, let's assume we'll add a method or use ProfileRepository.
-          // Actually, ProfileRepository updates belt, but not name/academy.
-          // Let's do it directly here for now or add a method to ProfileRepository.
-          // Better: Update ProfileRepository to handle initial setup.
-          
           await ref.read(profileRepositoryProvider).updateProfile(
             name: _nameController.text.trim(),
             academy: _academyController.text.trim(),
             beltInfo: beltInfo,
             trainingDays: _selectedWeekdays,
-            trainingTime: '${_selectedTime.hour}:${_selectedTime.minute}',
+            trainingTime: '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}',
           );
 
           // 3. Schedule Notifications
           if (_selectedWeekdays.isNotEmpty) {
             final notificationService = ref.read(notificationServiceProvider);
             await notificationService.requestPermissions();
-            // Schedule for 2 hours after class time
             final reminderTime = TimeOfDay(
               hour: (_selectedTime.hour + 2) % 24,
               minute: _selectedTime.minute,
@@ -72,16 +65,36 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               weekdays: _selectedWeekdays,
             );
           }
+          
+          // 4. Check if tutorial has been completed
+          final tutorialCompleted = await ref.read(tutorialRepositoryProvider).isTutorialCompleted();
+          
+          // DEBUG
+          print('DEBUG: Tutorial completed: $tutorialCompleted');
+          print('DEBUG: Will navigate to: ${tutorialCompleted ? "/home" : "/tutorial"}');
+          
+          if (mounted) {
+            if (!tutorialCompleted) {
+              // Show tutorial first, user is now authenticated
+              print('DEBUG: Navigating to /tutorial');
+              context.go('/tutorial');
+            } else {
+              // Go directly to home
+              print('DEBUG: Navigating to /home');
+              context.go('/home');
+            }
+          }
         }
       } catch (e) {
+        print('DEBUG: Error during registration: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: $e')),
           );
+          setState(() => _isLoading = false);
         }
-      } finally {
-        if (mounted) setState(() => _isLoading = false);
       }
+      // Don't set isLoading to false here - we're navigating away
     }
   }
 
@@ -99,7 +112,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.sports_martial_arts, size: 80, color: Color(0xFF1565C0)),
+                  const Icon(Icons.shield_outlined, size: 80, color: Color(0xFF1565C0)),
                   const SizedBox(height: 24),
                   Text(
                     'Bienvenido a MatLog',
@@ -153,7 +166,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           value: _selectedBelt,
                           decoration: const InputDecoration(
                             labelText: 'Cinturón',
-                            prefixIcon: Icon(Icons.sports_martial_arts),
+                            prefixIcon: Icon(Icons.military_tech),
                           ),
                           items: BeltColor.values.map((belt) {
                             return DropdownMenuItem(
@@ -162,7 +175,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             );
                           }).toList(),
                           onChanged: (value) {
-                            if (value != null) setState(() => _selectedBelt = value);
+                            if (value != null) {
+                              setState(() {
+                                _selectedBelt = value;
+                                // Reset stripes if switching to/from black belt with incompatible value
+                                if (_selectedBelt == BeltColor.black && _selectedStripes >= 10) {
+                                  _selectedStripes = 0;
+                                } else if (_selectedBelt != BeltColor.black && _selectedStripes >= 5) {
+                                  _selectedStripes = 0;
+                                }
+                              });
+                            }
                           },
                         ),
                       ),
@@ -174,12 +197,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             labelText: 'Grados',
                             prefixIcon: Icon(Icons.linear_scale),
                           ),
-                          items: List.generate(5, (index) {
-                            return DropdownMenuItem(
-                              value: index,
-                              child: Text('$index'),
-                            );
-                          }),
+                          items: List.generate(
+                            _selectedBelt == BeltColor.black ? 10 : 5,
+                            (index) {
+                              return DropdownMenuItem(
+                                value: index,
+                                child: Text('$index'),
+                              );
+                            },
+                          ),
                           onChanged: (value) {
                             if (value != null) setState(() => _selectedStripes = value);
                           },

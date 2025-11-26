@@ -108,6 +108,7 @@ class RivalsScreen extends ConsumerWidget {
         icon: const Icon(Icons.add),
         label: Text(AppLocalizations.of(context)!.addRival),
         backgroundColor: const Color(0xFF1565C0),
+        foregroundColor: Colors.white,
       ),
     );
   }

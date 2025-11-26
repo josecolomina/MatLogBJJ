@@ -157,7 +157,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                           prefixIcon: const Icon(
-                            Icons.sports_martial_arts,
+                            Icons.workspace_premium, // Changed from sports_martial_arts
                             color: Color(0xFF1565C0),
                             size: 28,
                           ),
@@ -185,7 +185,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           );
                         }).toList(),
                         onChanged: (value) {
-                          if (value != null) setState(() => _selectedBelt = value);
+                          if (value != null) {
+                            setState(() {
+                              _selectedBelt = value;
+                              // Reset stripes if out of range for new belt
+                              final maxStripes = value == BeltColor.black ? 10 : 4;
+                              if ((_selectedStripes ?? 0) > maxStripes) {
+                                _selectedStripes = 0;
+                              }
+                            });
+                          }
                         },
                       ),
                     ),
@@ -226,18 +235,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             vertical: 20,
                           ),
                         ),
-                        items: List.generate(10, (index) {
-                          return DropdownMenuItem(
-                            value: index,
-                            child: Text(
-                              '$index',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                        items: List.generate(
+                          (_selectedBelt == BeltColor.black ? 10 : 5), // 0-4 for colored, 0-9 for black
+                          (index) {
+                            return DropdownMenuItem(
+                              value: index,
+                              child: Text(
+                                '$index',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          );
-                        }),
+                            );
+                          },
+                        ),
                         onChanged: (value) {
                           if (value != null) setState(() => _selectedStripes = value);
                         },

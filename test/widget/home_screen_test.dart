@@ -48,10 +48,8 @@ void main() {
     // Verify Title
     expect(find.text('MatLog'), findsOneWidget);
     
-    // Verify Weekly Goal
-    expect(find.text('Weekly Goal'), findsOneWidget);
-    expect(find.text('2'), findsOneWidget);
-    expect(find.text('/ 4 sessions'), findsOneWidget);
+    // Weekly Goal card has been replaced with Missions button
+    // Missions button is in AppBar, so no specific text to check here
 
     // Verify Feed Section
     expect(find.text('Recent Activity'), findsOneWidget);

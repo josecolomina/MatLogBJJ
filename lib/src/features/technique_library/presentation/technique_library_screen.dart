@@ -58,6 +58,11 @@ class TechniqueLibraryScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text(AppLocalizations.of(context)!.errorLabel(err.toString()))),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push('/check-in'),
+        backgroundColor: const Color(0xFF1565C0),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
     );
   }
 }
