@@ -31,6 +31,9 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
   double _rpe = 5.0;
   bool _isLoading = false;
 
+  // Manual Technique Entry State
+  final List<Map<String, dynamic>> _manualTechniques = [];
+
   @override
   void dispose() {
     _durationController.dispose();
@@ -38,16 +41,38 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
     super.dispose();
   }
 
+  void _addTechnique() {
+    setState(() {
+      _manualTechniques.add({
+        'name': '',
+        'position': 'Guard',
+        'type': 'Drill',
+      });
+    });
+  }
+
+  void _removeTechnique(int index) {
+    setState(() {
+      _manualTechniques.removeAt(index);
+    });
+  }
+
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
+      print('🕵️ SPY: User tapped submit. Validating form...');
       setState(() => _isLoading = true);
       try {
         final user = ref.read(authRepositoryProvider).currentUser;
-        if (user == null) throw Exception('User not logged in');
+        if (user == null) {
+          print('🕵️ SPY: Error - User not logged in.');
+          throw Exception('User not logged in');
+        }
+        print('🕵️ SPY: User authenticated: ${user.uid}');
 
         final activityId = const Uuid().v4();
         final now = DateTime.now();
         final hasNotes = _notesController.text.isNotEmpty;
+        final hasTechniques = _manualTechniques.isNotEmpty;
 
         // Create Activity first
         final activity = Activity(
@@ -61,31 +86,25 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
           type: _selectedType,
           rpe: _rpe.round(),
           likesCount: 0,
-          hasTechnicalNotes: hasNotes,
+          hasTechnicalNotes: hasNotes || hasTechniques,
         );
 
+        print('🕵️ SPY: Adding activity to repository: $activityId');
         await ref.read(trainingRepositoryProvider).addActivity(activity);
+        print('🕵️ SPY: Activity added successfully.');
 
-        if (hasNotes) {
-          // AI processing
-          final geminiService = ref.read(geminiServiceProvider);
+        if (hasNotes || hasTechniques) {
+          print('🕵️ SPY: Notes or Techniques detected. Processing...');
+          
           final extractionService = ref.read(techniqueExtractionServiceProvider);
           
-          Map<String, dynamic> aiResult = {'summary': '', 'techniques': []};
-          try {
-             aiResult = await geminiService.processTechnicalNote(_notesController.text);
-          } catch (e) {
-            print('AI Processing failed: $e');
-            // Continue without AI data if it fails, or show error? 
-            // For now, let's continue with empty techniques to not block saving.
-          }
-
-          final techniquesList = (aiResult['techniques'] as List? ?? []).map((t) {
+          // Manual Processing (Bypassing AI)
+          final techniquesList = _manualTechniques.map((t) {
             return ProcessedTechnique(
               techniqueName: t['name'] ?? 'Unknown',
               category: t['type'] ?? 'Drill',
-              positionStart: t['position_start'] ?? 'Unknown',
-              positionEnd: t['position_end'] ?? 'Unknown',
+              positionStart: t['position'] ?? 'Unknown',
+              positionEnd: 'Unknown', // Not capturing end position manually for now
               tags: [],
               masteryLevel: 0, // Initial level
             );
@@ -95,16 +114,19 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
           final technicalLog = TechnicalLog(
             logId: logId,
             activityRef: activityId,
-            rawInputText: _notesController.text,
+            rawInputText: _notesController.text, // Keep notes for reference
             processedTechniques: techniquesList,
-            aiSummary: aiResult['summary'] ?? '',
+            aiSummary: 'Manual Entry',
             createdAt: now,
           );
 
+          print('🕵️ SPY: Saving technical log: $logId with ${techniquesList.length} techniques');
           await ref.read(trainingRepositoryProvider).addTechnicalLog(user.uid, technicalLog);
           
-          // Update Technique Library
+          // Update Technique Library & Missions
+          print('🕵️ SPY: Updating technique library and missions...');
           final leveledUpTechniques = await extractionService.processTechnicalLog(technicalLog, activity);
+          print('🕵️ SPY: Technique library updated. Level ups: ${leveledUpTechniques.length}');
           
           if (mounted && leveledUpTechniques.isNotEmpty) {
              // Show level up dialogs sequentially or just the first one for now
@@ -116,9 +138,12 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
                );
              }
           }
+        } else {
+          print('🕵️ SPY: No notes or techniques provided.');
         }
 
         if (mounted) {
+          print('🕵️ SPY: Submission complete. Closing screen.');
           HapticFeedback.mediumImpact(); // Haptic feedback for training logged
           context.pop();
           ScaffoldMessenger.of(context).showSnackBar(
@@ -126,6 +151,7 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
           );
         }
       } catch (e) {
+        print('🕵️ SPY: Critical error during submission: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(AppLocalizations.of(context)!.errorLabel(e.toString()))),
@@ -211,8 +237,85 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
                   hintText: '...',
                   border: const OutlineInputBorder(),
                 ),
-                maxLines: 5,
+                maxLines: 3,
               ),
+              const SizedBox(height: 24),
+              
+              // Manual Technique Entry Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Técnicas',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle, color: Color(0xFF1565C0)),
+                    onPressed: _addTechnique,
+                  ),
+                ],
+              ),
+              if (_manualTechniques.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text('No techniques added yet.', style: TextStyle(color: Colors.grey)),
+                ),
+              ..._manualTechniques.asMap().entries.map((entry) {
+                final index = entry.key;
+                final technique = entry.value;
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                initialValue: technique['name'],
+                                decoration: const InputDecoration(labelText: 'Nombre (e.g. Armbar)'),
+                                onChanged: (val) => technique['name'] = val,
+                                validator: (val) => val!.isEmpty ? 'Required' : null,
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _removeTechnique(index),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonFormField<String>(
+                                value: technique['position'],
+                                items: ['Guard', 'Side Control', 'Mount', 'Back', 'Standing']
+                                    .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+                                    .toList(),
+                                onChanged: (val) => setState(() => technique['position'] = val),
+                                decoration: const InputDecoration(labelText: 'Posición'),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: DropdownButtonFormField<String>(
+                                value: technique['type'],
+                                items: ['Drill', 'Sparring', 'Submission', 'Pass', 'Sweep', 'Escape']
+                                    .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                                    .toList(),
+                                onChanged: (val) => setState(() => technique['type'] = val),
+                                decoration: const InputDecoration(labelText: 'Tipo'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+
               const SizedBox(height: 24),
               _isLoading
                   ? const Center(child: CircularProgressIndicator())

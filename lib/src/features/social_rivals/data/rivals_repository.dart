@@ -41,6 +41,54 @@ class RivalsRepository {
     }
   }
 
+  Future<void> addRivalByTag(String currentUserId, String usernameTag) async {
+    // 1. Find user by tag
+    final querySnapshot = await _firestore
+        .collection('users')
+        .where('search_key', isEqualTo: usernameTag.toLowerCase())
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isEmpty) {
+      throw Exception('Usuario no encontrado');
+    }
+
+    final userDoc = querySnapshot.docs.first;
+    final userData = userDoc.data();
+    final rivalUid = userDoc.id;
+    final rivalName = userData['name'] as String;
+
+    if (rivalUid == currentUserId) {
+      throw Exception('No puedes agregarte a ti mismo como rival');
+    }
+    // We could also store belt info here if needed
+
+    // 2. Add to rivals collection
+    final rivalRef = _firestore
+        .collection('users')
+        .doc(currentUserId)
+        .collection('rivals')
+        .doc(rivalUid);
+
+    final snapshot = await rivalRef.get();
+    if (!snapshot.exists) {
+      await rivalRef.set({
+        'rivalUid': rivalUid,
+        'rivalName': rivalName,
+        'usernameTag': usernameTag, // Store tag for display
+        'wins': 0,
+        'losses': 0,
+        'draws': 0,
+        'lastRolledAt': FieldValue.serverTimestamp(),
+        'notes': '',
+      });
+    } else {
+      throw Exception('Este usuario ya está en tus compañeros');
+    }
+  }
+
+
+
   Future<void> logMatch(String userId, String rivalId, String result) async {
     final rivalRef = _firestore
         .collection('users')

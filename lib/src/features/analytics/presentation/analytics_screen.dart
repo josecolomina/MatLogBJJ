@@ -6,7 +6,10 @@ import '../../training_log/data/training_repository.dart';
 import '../../training_log/domain/activity.dart';
 import '../../technique_library/data/technique_repository.dart';
 import '../../technique_library/domain/technique.dart';
-import '../../../services/data_seeder.dart';
+
+import '../../authentication/data/auth_repository.dart';
+import '../../social_rivals/data/rivals_repository.dart';
+import '../../social_rivals/domain/rival.dart';
 
 class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
@@ -17,12 +20,13 @@ class AnalyticsScreen extends ConsumerStatefulWidget {
 
 class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   int _touchedIndex = -1;
-  bool _isSeeding = false;
 
   @override
   Widget build(BuildContext context) {
     final trainingAsync = ref.watch(userActivitiesProvider);
     final techniquesAsync = ref.watch(userTechniquesProvider);
+    final user = ref.watch(authRepositoryProvider).currentUser;
+    final rivalsAsync = user != null ? ref.watch(rivalsStreamProvider(user.uid)) : const AsyncValue<List<Rival>>.loading();
 
     return Scaffold(
       appBar: AppBar(
@@ -30,53 +34,52 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        actions: [
-          IconButton(
-            icon: _isSeeding 
-              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) 
-              : const Icon(Icons.science),
-            tooltip: 'Generar Datos de Prueba',
-            onPressed: _isSeeding ? null : _seedData,
-          ),
-        ],
       ),
       backgroundColor: Colors.grey[50],
       body: trainingAsync.when(
         data: (activities) => techniquesAsync.when(
-          data: (techniques) => SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSectionTitle(context, AppLocalizations.of(context)!.gameStyleTitle, AppLocalizations.of(context)!.gameStyleExplanation),
-                const SizedBox(height: 16),
-                _buildRadarChartCard(techniques),
-                const SizedBox(height: 32),
-                _buildSectionTitle(context, AppLocalizations.of(context)!.trainingDistributionTitle, AppLocalizations.of(context)!.trainingDistributionExplanation),
-                const SizedBox(height: 16),
-                _buildGiNoGiChartCard(activities),
-                const SizedBox(height: 32),
-                _buildSectionTitle(context, AppLocalizations.of(context)!.matTimeTitle, AppLocalizations.of(context)!.matTimeExplanation),
-                const SizedBox(height: 16),
-                _buildMatTimeChartCard(activities),
-                const SizedBox(height: 32),
-                _buildSectionTitle(context, AppLocalizations.of(context)!.intensityTitle, AppLocalizations.of(context)!.intensityExplanation),
-                const SizedBox(height: 16),
-                _buildIntensityChartCard(activities),
-                const SizedBox(height: 32),
-                _buildSectionTitle(context, AppLocalizations.of(context)!.topPositionsTitle, AppLocalizations.of(context)!.topPositionsExplanation),
-                const SizedBox(height: 16),
-                _buildTechniqueCategoriesChartCard(techniques),
-                const SizedBox(height: 32),
-                _buildSectionTitle(context, 'Progreso de las Técnicas', 'Muestra la distribución de tus técnicas por nivel de maestría. Te ayuda a ver cuántas técnicas dominas en cada cinturón.'),
-                const SizedBox(height: 16),
-                _buildBeltProgressChartCard(techniques),
-                const SizedBox(height: 32),
-                _buildSectionTitle(context, AppLocalizations.of(context)!.weeklyConsistencyTitle, AppLocalizations.of(context)!.weeklyConsistencyExplanation),
-                const SizedBox(height: 16),
-                _buildActivityChartCard(activities),
-              ],
+          data: (techniques) => rivalsAsync.when(
+            data: (rivals) => SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionTitle(context, AppLocalizations.of(context)!.gameStyleTitle, AppLocalizations.of(context)!.gameStyleExplanation),
+                  const SizedBox(height: 16),
+                  _buildRadarChartCard(techniques),
+                  const SizedBox(height: 32),
+                  _buildSectionTitle(context, AppLocalizations.of(context)!.trainingDistributionTitle, AppLocalizations.of(context)!.trainingDistributionExplanation),
+                  const SizedBox(height: 16),
+                  _buildGiNoGiChartCard(activities),
+                  const SizedBox(height: 32),
+                  _buildSectionTitle(context, AppLocalizations.of(context)!.matTimeTitle, AppLocalizations.of(context)!.matTimeExplanation),
+                  const SizedBox(height: 16),
+                  _buildMatTimeChartCard(activities),
+                  const SizedBox(height: 32),
+                  _buildSectionTitle(context, AppLocalizations.of(context)!.intensityTitle, AppLocalizations.of(context)!.intensityExplanation),
+                  const SizedBox(height: 16),
+                  _buildIntensityChartCard(activities),
+                  const SizedBox(height: 32),
+                  _buildSectionTitle(context, AppLocalizations.of(context)!.topPositionsTitle, AppLocalizations.of(context)!.topPositionsExplanation),
+                  const SizedBox(height: 16),
+                  _buildTechniqueCategoriesChartCard(techniques),
+                  const SizedBox(height: 32),
+                  _buildSectionTitle(context, 'Progreso de las Técnicas', 'Muestra la distribución de tus técnicas por nivel de maestría. Te ayuda a ver cuántas técnicas dominas en cada cinturón.'),
+                  const SizedBox(height: 16),
+                  _buildBeltProgressChartCard(techniques),
+                  const SizedBox(height: 32),
+                  _buildSectionTitle(context, AppLocalizations.of(context)!.weeklyConsistencyTitle, AppLocalizations.of(context)!.weeklyConsistencyExplanation),
+                  const SizedBox(height: 16),
+                  _buildActivityChartCard(activities),
+                  const SizedBox(height: 32),
+                  _buildSectionTitle(context, 'Estadísticas de Combate', 'Resumen de tus enfrentamientos con rivales registrados.'),
+                  const SizedBox(height: 16),
+                  _buildRivalsStatsCard(rivals),
+                ],
+              ),
             ),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (err, stack) => Center(child: Text('Error loading rivals: $err')),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (err, stack) => Center(child: Text('Error loading techniques: $err')),
@@ -87,25 +90,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     );
   }
 
-  Future<void> _seedData() async {
-    setState(() => _isSeeding = true);
-    try {
-      await ref.read(dataSeederProvider).seedTrainingData();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Datos de prueba generados correctamente')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isSeeding = false);
-    }
-  }
+
 
   Widget _buildSectionTitle(BuildContext context, String title, String explanation) {
     return GestureDetector(
@@ -363,13 +348,13 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               ),
               borderData: FlBorderData(show: false),
               barGroups: [
-                _makeGroupData(0, activityCounts[0]!.toDouble(), maxY: maxY),
-                _makeGroupData(1, activityCounts[1]!.toDouble(), maxY: maxY),
-                _makeGroupData(2, activityCounts[2]!.toDouble(), maxY: maxY),
-                _makeGroupData(3, activityCounts[3]!.toDouble(), maxY: maxY),
-                _makeGroupData(4, activityCounts[4]!.toDouble(), maxY: maxY),
-                _makeGroupData(5, activityCounts[5]!.toDouble(), maxY: maxY),
-                _makeGroupData(6, activityCounts[6]!.toDouble(), maxY: maxY),
+                _makeGroupData(0, activityCounts[0]!.toDouble(), maxY: maxY, barColor: _getActivityColor(activityCounts[0]!)),
+                _makeGroupData(1, activityCounts[1]!.toDouble(), maxY: maxY, barColor: _getActivityColor(activityCounts[1]!)),
+                _makeGroupData(2, activityCounts[2]!.toDouble(), maxY: maxY, barColor: _getActivityColor(activityCounts[2]!)),
+                _makeGroupData(3, activityCounts[3]!.toDouble(), maxY: maxY, barColor: _getActivityColor(activityCounts[3]!)),
+                _makeGroupData(4, activityCounts[4]!.toDouble(), maxY: maxY, barColor: _getActivityColor(activityCounts[4]!)),
+                _makeGroupData(5, activityCounts[5]!.toDouble(), maxY: maxY, barColor: _getActivityColor(activityCounts[5]!)),
+                _makeGroupData(6, activityCounts[6]!.toDouble(), maxY: maxY, barColor: _getActivityColor(activityCounts[6]!)),
               ],
               gridData: const FlGridData(show: false),
             ),
@@ -625,8 +610,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     // Calculate average RPE per week
     final allWeeks = weeklyRPE.keys.toList()..sort();
     
-    // Show only last 12 weeks to avoid saturation
-    final weeks = allWeeks.length > 12 ? allWeeks.sublist(allWeeks.length - 12) : allWeeks;
+    // Show only last 8 weeks to avoid saturation
+    final weeks = allWeeks.length > 8 ? allWeeks.sublist(allWeeks.length - 8) : allWeeks;
     final maxY = 10.0;
 
     int touchedIndex = -1;
@@ -658,39 +643,44 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           context: context,
                           builder: (context) => AlertDialog(
                             title: Text('Semana ${weekStartDates[weekNumber]!.day}/${weekStartDates[weekNumber]!.month}'),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ...sessionsInWeek.map((activity) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          width: 8,
-                                          height: 8,
-                                          decoration: BoxDecoration(
-                                            color: _getRpeColor(activity.rpe.toDouble()),
-                                            shape: BoxShape.circle,
-                                          ),
+                            content: SizedBox(
+                              width: double.maxFinite,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ...sessionsInWeek.map((activity) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(bottom: 8.0),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 8,
+                                              height: 8,
+                                              decoration: BoxDecoration(
+                                                color: _getRpeColor(activity.rpe.toDouble()),
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                '${activity.timestampStart.day}/${activity.timestampStart.month} - ${activity.type.toUpperCase()}',
+                                                style: const TextStyle(fontSize: 13),
+                                              ),
+                                            ),
+                                            Text(
+                                              'RPE: ${activity.rpe}',
+                                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            '${activity.timestampStart.day}/${activity.timestampStart.month} - ${activity.type.toUpperCase()}',
-                                            style: const TextStyle(fontSize: 13),
-                                          ),
-                                        ),
-                                        Text(
-                                          'RPE: ${activity.rpe}',
-                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                              ],
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ),
                             ),
                             actions: [
                               TextButton(
@@ -728,11 +718,12 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           final date = weekStartDates[weekNumber];
                           if (date == null) return const SizedBox.shrink();
                           
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
+                          return SideTitleWidget(
+                            meta: meta,
+                            space: 8,
                             child: Text(
                               '${date.day}/${date.month}',
-                              style: const TextStyle(color: Colors.grey, fontSize: 9),
+                              style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
                           );
                         },
@@ -824,6 +815,18 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     return Colors.red;
   }
 
+  Color _getFrequencyColor(double percentage) {
+    if (percentage < 0.33) return Colors.green;
+    if (percentage < 0.66) return Colors.orange;
+    return Colors.red;
+  }
+
+  Color _getActivityColor(int count) {
+    if (count <= 1) return Colors.green;
+    if (count == 2) return Colors.orange;
+    return Colors.red;
+  }
+
   Widget _buildTechniqueCategoriesChartCard(List<Technique> techniques) {
     if (techniques.isEmpty) return const SizedBox.shrink();
 
@@ -877,7 +880,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                           child: Container(
                             height: 12,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1565C0),
+                              color: _getFrequencyColor(percentage),
                               borderRadius: BorderRadius.circular(6),
                             ),
                           ),
@@ -1004,5 +1007,107 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
       default:
         return Colors.grey;
     }
+  }
+
+  Widget _buildRivalsStatsCard(List<Rival> rivals) {
+    if (rivals.isEmpty) {
+      return const Card(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Center(child: Text('No hay datos de rivales aún')),
+        ),
+      );
+    }
+
+    Rival? mostFrequent;
+    Rival? nemesis;
+    Rival? customer;
+
+    int maxMatches = 0;
+    int maxLosses = 0;
+    int maxWins = 0;
+
+    for (var r in rivals) {
+      final totalMatches = r.wins + r.losses + r.draws;
+      if (totalMatches > maxMatches) {
+        maxMatches = totalMatches;
+        mostFrequent = r;
+      }
+
+      if (r.losses > maxLosses) { // My losses against them
+        maxLosses = r.losses;
+        nemesis = r;
+      }
+
+      if (r.wins > maxWins) { // My wins against them
+        maxWins = r.wins;
+        customer = r;
+      }
+    }
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildStatRow(
+              'Mayor Rival', 
+              mostFrequent?.rivalName ?? '-', 
+              '${mostFrequent?.wins ?? 0}W - ${mostFrequent?.losses ?? 0}L - ${mostFrequent?.draws ?? 0}D',
+              Icons.people,
+              Colors.blue,
+            ),
+            const Divider(),
+            _buildStatRow(
+              'Tu Némesis', 
+              nemesis?.rivalName ?? '-', 
+              'Has perdido ${nemesis?.losses ?? 0} veces',
+              Icons.warning_amber_rounded,
+              Colors.red,
+            ),
+            const Divider(),
+            _buildStatRow(
+              'Tu Cliente', 
+              customer?.rivalName ?? '-', 
+              'Has ganado ${customer?.wins ?? 0} veces',
+              Icons.check_circle_outline,
+              Colors.green,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatRow(String title, String name, String subtitle, IconData icon, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(subtitle, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

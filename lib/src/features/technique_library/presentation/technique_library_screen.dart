@@ -66,7 +66,7 @@ class TechniqueLibraryScreen extends ConsumerWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            MasteryBeltWidget(belt: technique.masteryBelt, height: 12, showLabel: false),
+                            MasteryBeltWidget(belt: technique.masteryBelt, height: 12, showLabel: false, expandWidth: true),
                             const SizedBox(height: 4),
                             Text('${technique.totalRepetitions} reps', style: Theme.of(context).textTheme.bodySmall),
                           ],

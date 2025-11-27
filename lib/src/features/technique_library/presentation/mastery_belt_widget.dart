@@ -6,12 +6,14 @@ class MasteryBeltWidget extends StatelessWidget {
   final MasteryBelt belt;
   final double height;
   final bool showLabel;
+  final bool expandWidth;
 
   const MasteryBeltWidget({
     super.key,
     required this.belt,
     this.height = 20,
     this.showLabel = true,
+    this.expandWidth = false,
   });
 
   Color get _beltColor {
@@ -67,22 +69,21 @@ class MasteryBeltWidget extends StatelessWidget {
         ],
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: expandWidth ? MainAxisSize.max : MainAxisSize.min,
         children: [
-          Expanded(
-            child: Center(
-              child: showLabel
-                  ? Text(
-                      _getLocalizedBeltName(context).toUpperCase(),
-                      style: TextStyle(
-                        color: _textColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: height * 0.5,
-                      ),
-                    )
-                  : null,
+          if (showLabel)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                _getLocalizedBeltName(context).toUpperCase(),
+                style: TextStyle(
+                  color: _textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: height * 0.5,
+                ),
+              ),
             ),
-          ),
+          if (expandWidth) const Spacer(),
           // Rank Bar
           Container(
             width: height * 1.5, // Proportional width

@@ -1,20 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:matlog/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../authentication/data/auth_repository.dart';
+import '../../profile/data/profile_repository.dart';
 import '../data/rivals_repository.dart';
 import '../domain/rival.dart';
 
-class RivalsScreen extends ConsumerWidget {
+class RivalsScreen extends ConsumerStatefulWidget {
   const RivalsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RivalsScreen> createState() => _RivalsScreenState();
+}
+
+class _RivalsScreenState extends ConsumerState<RivalsScreen> {
+  List<String>? _initialRivalOrder;
+
+  @override
+  void initState() {
+    super.initState();
+    // Ensure user tag exists for legacy users
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(profileRepositoryProvider).ensureUserTag();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(authRepositoryProvider).currentUser;
     if (user == null) return const Center(child: Text('Please login'));
 
     final rivalsAsync = ref.watch(rivalsStreamProvider(user.uid));
+    final userProfileAsync = ref.watch(userProfileStreamProvider);
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -24,84 +43,177 @@ class RivalsScreen extends ConsumerWidget {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
-      body: rivalsAsync.when(
-        data: (rivals) {
-          if (rivals.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    AppLocalizations.of(context)!.noRivals,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            );
-          }
+      body: Column(
+        children: [
+          // User ID Section
+          userProfileAsync.when(
+            data: (snapshot) {
+              final data = snapshot.data() as Map<String, dynamic>?;
+              final usernameTag = data?['username_tag'] as String?;
+              
+              if (usernameTag == null) return const SizedBox.shrink();
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: rivals.length,
-            itemBuilder: (context, index) {
-              final rival = rivals[index];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: ExpansionTile(
-                  leading: CircleAvatar(
-                    backgroundColor: const Color(0xFF1565C0),
-                    child: Text(
-                      rival.rivalName.substring(0, 1).toUpperCase(),
-                      style: const TextStyle(color: Colors.white),
+              return Container(
+                width: double.infinity,
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                     ),
-                  ),
-                  title: Text(
-                    rival.rivalName,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    '${rival.wins}W - ${rival.losses}L - ${rival.draws}D',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
+                  ],
+                ),
+                child: Row(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    const Icon(Icons.tag, color: Color(0xFF1565C0)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _MatchButton(
-                            label: AppLocalizations.of(context)!.winLabel,
-                            color: Colors.green,
-                            icon: Icons.emoji_events,
-                            onPressed: () => _logMatch(context, ref, user.uid, rival, 'win'),
+                          const Text(
+                            'Tu ID de Usuario',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                          _MatchButton(
-                            label: AppLocalizations.of(context)!.lossLabel,
-                            color: Colors.red,
-                            icon: Icons.close,
-                            onPressed: () => _logMatch(context, ref, user.uid, rival, 'loss'),
-                          ),
-                          _MatchButton(
-                            label: AppLocalizations.of(context)!.drawLabel,
-                            color: Colors.orange,
-                            icon: Icons.handshake,
-                            onPressed: () => _logMatch(context, ref, user.uid, rival, 'draw'),
+                          Text(
+                            usernameTag,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
                         ],
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.copy, color: Color(0xFF1565C0)),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: usernameTag));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('ID copiado al portapapeles')),
+                        );
+                      },
                     ),
                   ],
                 ),
               );
             },
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text(AppLocalizations.of(context)!.errorLabel(err.toString()))),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+          
+          Expanded(
+            child: rivalsAsync.when(
+              data: (rivals) {
+                if (rivals.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
+                        const SizedBox(height: 16),
+                        Text(
+                          AppLocalizations.of(context)!.noRivals,
+                          style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  );
+                }
+
+                // Freeze order logic
+                if (_initialRivalOrder == null) {
+                  _initialRivalOrder = rivals.map((r) => r.rivalUid).toList();
+                }
+
+                final sortedRivals = List<Rival>.from(rivals);
+                sortedRivals.sort((a, b) {
+                  final indexA = _initialRivalOrder!.indexOf(a.rivalUid);
+                  final indexB = _initialRivalOrder!.indexOf(b.rivalUid);
+
+                  // New items go to top
+                  if (indexA == -1 && indexB == -1) return 0;
+                  if (indexA == -1) return -1;
+                  if (indexB == -1) return 1;
+
+                  return indexA.compareTo(indexB);
+                });
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  itemCount: sortedRivals.length,
+                  itemBuilder: (context, index) {
+                    final rival = sortedRivals[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: ExpansionTile(
+                        shape: const Border(),
+                        collapsedShape: const Border(),
+                        leading: CircleAvatar(
+                          backgroundColor: const Color(0xFF1565C0),
+                          child: Text(
+                            rival.rivalName.substring(0, 1).toUpperCase(),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        title: Text(
+                          rival.rivalName.split('#')[0], // Ensure only name is shown
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          '${rival.wins}W - ${rival.losses}L - ${rival.draws}D',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _MatchButton(
+                                  label: AppLocalizations.of(context)!.winLabel,
+                                  color: Colors.green,
+                                  icon: Icons.emoji_events,
+                                  onPressed: () => _logMatch(context, ref, user.uid, rival, 'win'),
+                                ),
+                                _MatchButton(
+                                  label: AppLocalizations.of(context)!.lossLabel,
+                                  color: Colors.red,
+                                  icon: Icons.close,
+                                  onPressed: () => _logMatch(context, ref, user.uid, rival, 'loss'),
+                                ),
+                                _MatchButton(
+                                  label: AppLocalizations.of(context)!.drawLabel,
+                                  color: Colors.orange,
+                                  icon: Icons.handshake,
+                                  onPressed: () => _logMatch(context, ref, user.uid, rival, 'draw'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Center(child: Text(AppLocalizations.of(context)!.errorLabel(err.toString()))),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showNewRivalDialog(context, ref, user.uid),

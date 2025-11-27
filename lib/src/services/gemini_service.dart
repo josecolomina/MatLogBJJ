@@ -7,7 +7,7 @@ class GeminiService {
 
   GeminiService(String apiKey)
       : _model = GenerativeModel(
-          model: 'gemini-1.5-flash',
+          model: 'gemini-1.5-flash-latest',
           apiKey: apiKey,
           generationConfig: GenerationConfig(
             temperature: 0.2,
@@ -16,6 +16,33 @@ class GeminiService {
         );
 
   Future<Map<String, dynamic>> processTechnicalNote(String text) async {
+    print('🕵️ SPY: GeminiService - Processing note: "$text"');
+    
+    // Try primary model first
+    try {
+      return await _generateWithModel('gemini-1.5-flash', text);
+    } catch (e) {
+      print('🕵️ SPY: GeminiService - Primary model failed: $e');
+      print('🕵️ SPY: GeminiService - Attempting fallback to gemini-pro...');
+      try {
+        return await _generateWithModel('gemini-pro', text);
+      } catch (e2) {
+        print('🕵️ SPY: GeminiService - Fallback model failed: $e2');
+        throw e2;
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>> _generateWithModel(String modelName, String text) async {
+    final model = GenerativeModel(
+      model: modelName,
+      apiKey: _model.apiKey,
+      generationConfig: GenerationConfig(
+        temperature: 0.2,
+        responseMimeType: 'application/json',
+      ),
+    );
+
     final prompt = '''
 Eres "MatLog AI", un experto cinturón negro en BJJ. Tu trabajo es estructurar notas de entrenamiento.
 
@@ -48,15 +75,22 @@ REGLAS:
 ''';
 
     final content = [Content.text(prompt)];
-    final response = await _model.generateContent(content);
+    print('🕵️ SPY: GeminiService - Sending request to model $modelName...');
+    final response = await model.generateContent(content);
 
     if (response.text == null) {
+      print('🕵️ SPY: GeminiService - Error: Empty response from $modelName');
       throw Exception('Empty response from Gemini');
     }
 
+    print('🕵️ SPY: GeminiService - Raw response from $modelName: ${response.text}');
+
     try {
-      return jsonDecode(response.text!);
+      final json = jsonDecode(response.text!);
+      print('🕵️ SPY: GeminiService - JSON parsed successfully.');
+      return json;
     } catch (e) {
+      print('🕵️ SPY: GeminiService - JSON parsing failed: $e');
       throw Exception('Failed to parse Gemini response: $e');
     }
   }

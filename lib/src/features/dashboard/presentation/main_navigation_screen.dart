@@ -17,6 +17,8 @@ class MainNavigationScreen extends ConsumerStatefulWidget {
   final GlobalKey? classesKey;
   final GlobalKey? profileKey;
   final GlobalKey? addTrainingFabKey;
+  final GlobalKey? analyticsTabKey;
+  final GlobalKey? analyticsTabActiveKey;
   
   const MainNavigationScreen({
     super.key,
@@ -29,6 +31,8 @@ class MainNavigationScreen extends ConsumerStatefulWidget {
     this.classesKey,
     this.profileKey,
     this.addTrainingFabKey,
+    this.analyticsTabKey,
+    this.analyticsTabActiveKey,
   });
 
   @override
@@ -141,8 +145,9 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
               activeIcon: Icon(Icons.library_books, key: widget.techniquesTabActiveKey),
               label: 'Técnicas',
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.insights),
+             BottomNavigationBarItem(
+              icon: Icon(Icons.insights, key: widget.analyticsTabKey),
+              activeIcon: Icon(Icons.insights, key: widget.analyticsTabActiveKey),
               label: 'Progreso',
             ),
           ],

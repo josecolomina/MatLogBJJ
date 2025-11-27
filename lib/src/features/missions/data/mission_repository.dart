@@ -29,26 +29,32 @@ class MissionRepository {
         isNew: false,
       );
 
-      // Mock Missions for Demo
-      final mockMissions = [
+      // Real Stats
+      final totalSubmissions = data['total_submissions'] as int? ?? 0;
+      final totalPasses = data['total_passes'] as int? ?? 0;
+      // final totalSweeps = data['total_sweeps'] as int? ?? 0;
+
+      // Real Missions
+      final realMissions = [
         Mission(
           id: 'first_submission',
           title: 'Primera Finalización',
           description: 'Logra tu primera finalización en un sparring.',
-          currentProgress: 0,
+          currentProgress: totalSubmissions,
           target: 1,
-          isCompleted: false,
-          isNew: !viewedMissions.contains('first_submission'),
+          isCompleted: totalSubmissions >= 1,
+          isNew: !viewedMissions.contains('first_submission') && totalSubmissions >= 1, // Only show as new if completed? Or always? Let's stick to simple logic for now.
         ),
         Mission(
           id: 'guard_passer',
           title: 'Pasador de Guardia',
           description: 'Pasa la guardia 10 veces.',
-          currentProgress: 3,
+          currentProgress: totalPasses,
           target: 10,
-          isCompleted: false,
-          isNew: !viewedMissions.contains('guard_passer'),
+          isCompleted: totalPasses >= 10,
+          isNew: !viewedMissions.contains('guard_passer') && totalPasses >= 10,
         ),
+        // Keep Iron Defense as mock for now as we don't track "rounds survived" yet
         Mission(
           id: 'iron_defense',
           title: 'Defensa de Hierro',
@@ -59,6 +65,8 @@ class MissionRepository {
           isNew: false,
         ),
       ];
+
+      return [weeklyGoal, ...realMissions];
 
       return [weeklyGoal, ...mockMissions];
     });

@@ -15,10 +15,14 @@ import 'technique_input_validator.dart';
 /// - Manejar errores gracefully
 /// - Detectar level-ups
 /// - Logging para debugging
+import '../../profile/data/profile_repository.dart';
+// ... other imports
+
 class TechniqueExtractionService {
   final TechniqueRepository _repository;
+  final ProfileRepository _profileRepository;
 
-  TechniqueExtractionService(this._repository);
+  TechniqueExtractionService(this._repository, this._profileRepository);
 
   /// Procesa un log técnico completo
   /// 
@@ -39,7 +43,7 @@ class TechniqueExtractionService {
     Activity activity,
   ) async {
     try {
-      print('DEBUG: Processing technical log: ${log.logId} with ${log.processedTechniques.length} techniques');
+      print('🕵️ SPY: ExtractionService - Processing technical log: ${log.logId} with ${log.processedTechniques.length} techniques');
       
       final multiplier = activity.type == 'open_mat' ? 2 : 1;
       final leveledUpTechniques = <Technique>[];
@@ -60,19 +64,40 @@ class TechniqueExtractionService {
         } catch (e, stackTrace) {
           failureCount++;
           // Log error pero continuar con otras técnicas
-          print('ERROR: Failed to process technique "${technique.techniqueName}": $e');
-          print('Stack trace: $stackTrace');
+          print('🕵️ SPY: ExtractionService - Failed to process technique "${technique.techniqueName}": $e');
+          print('🕵️ SPY: Stack trace: $stackTrace');
           // NO re-lanzar - queremos procesar todas las técnicas posibles
         }
       }
       
-      print('DEBUG: Processed ${log.processedTechniques.length} techniques. Success: $successCount, Failures: $failureCount, Level-ups: ${leveledUpTechniques.length}');
+      print('🕵️ SPY: ExtractionService - Processed ${log.processedTechniques.length} techniques. Success: $successCount, Failures: $failureCount, Level-ups: ${leveledUpTechniques.length}');
       
+      // Update Mission Stats
+      int submissions = 0;
+      int passes = 0;
+      int sweeps = 0;
+
+      for (final technique in log.processedTechniques) {
+        final type = technique.category.toLowerCase();
+        if (type.contains('submission') || type.contains('finaliz')) submissions++;
+        if (type.contains('pass') || type.contains('pasaje')) passes++;
+        if (type.contains('sweep') || type.contains('raspado')) sweeps++;
+      }
+
+      if (submissions > 0 || passes > 0 || sweeps > 0) {
+        print('🕵️ SPY: ExtractionService - Updating mission stats: Submissions=$submissions, Passes=$passes, Sweeps=$sweeps');
+        await _profileRepository.updateMissionStats(
+          submissions: submissions,
+          passes: passes,
+          sweeps: sweeps,
+        );
+      }
+
       return leveledUpTechniques;
       
     } catch (e, stackTrace) {
-      print('CRITICAL ERROR: Failed to process technical log ${log.logId}: $e');
-      print('Stack trace: $stackTrace');
+      print('🕵️ SPY: ExtractionService - CRITICAL ERROR: Failed to process technical log ${log.logId}: $e');
+      print('🕵️ SPY: Stack trace: $stackTrace');
       rethrow;
     }
   }
@@ -100,9 +125,9 @@ class TechniqueExtractionService {
         technique.positionStart,
       );
       
-      print('DEBUG: Sanitized technique: "$cleanName" ($cleanPosition - $cleanCategory)');
+      print('🕵️ SPY: ExtractionService - Sanitized technique: "$cleanName" ($cleanPosition - $cleanCategory)');
     } on ValidationException catch (e) {
-      print('WARNING: Invalid technique data, skipping: $e');
+      print('🕵️ SPY: ExtractionService - WARNING: Invalid technique data, skipping: $e');
       return null; // Skip invalid techniques
     }
     
@@ -111,7 +136,7 @@ class TechniqueExtractionService {
     try {
       id = TechniqueInputValidator.generateSafeId(cleanName, cleanPosition);
     } on ValidationException catch (e) {
-      print('WARNING: Cannot generate ID, skipping: $e');
+      print('🕵️ SPY: ExtractionService - WARNING: Cannot generate ID, skipping: $e');
       return null;
     }
     
@@ -132,7 +157,7 @@ class TechniqueExtractionService {
         final newBelt = MasteryBelt.fromRepetitions(newReps);
         
         if (attempt > 0) {
-          print('DEBUG: Retry attempt $attempt for technique: $cleanName');
+          print('🕵️ SPY: ExtractionService - Retry attempt $attempt for technique: $cleanName');
         }
         
         // Increment repetitions
@@ -147,7 +172,7 @@ class TechniqueExtractionService {
         if (newBelt.index > oldBelt.index) {
           final updated = await _repository.getTechnique(id);
           if (updated != null) {
-            print('INFO: ✨ Technique leveled up: $cleanName from ${oldBelt.name.toUpperCase()} to ${newBelt.name.toUpperCase()}');
+            print('🕵️ SPY: ExtractionService - INFO: ✨ Technique leveled up: $cleanName from ${oldBelt.name.toUpperCase()} to ${newBelt.name.toUpperCase()}');
             return updated;
           }
         }
@@ -160,13 +185,13 @@ class TechniqueExtractionService {
         
         if (attempt == maxRetries - 1) {
           // Last attempt failed
-          print('ERROR: Failed after $maxRetries attempts for technique "$cleanName": ${e.code} - ${e.message}');
+          print('🕵️ SPY: ExtractionService - ERROR: Failed after $maxRetries attempts for technique "$cleanName": ${e.code} - ${e.message}');
           rethrow;
         }
         
         // Wait before retry with exponential backoff
         final delayMs = 100 * (attempt + 1);
-        print('WARNING: Attempt ${attempt + 1} failed for "$cleanName", retrying in ${delayMs}ms...');
+        print('🕵️ SPY: ExtractionService - WARNING: Attempt ${attempt + 1} failed for "$cleanName", retrying in ${delayMs}ms...');
         await Future.delayed(Duration(milliseconds: delayMs));
       }
     }
@@ -182,5 +207,6 @@ class TechniqueExtractionService {
 
 final techniqueExtractionServiceProvider = Provider<TechniqueExtractionService>((ref) {
   final repository = ref.watch(techniqueRepositoryProvider);
-  return TechniqueExtractionService(repository);
+  final profileRepository = ref.watch(profileRepositoryProvider);
+  return TechniqueExtractionService(repository, profileRepository);
 });

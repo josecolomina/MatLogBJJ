@@ -9,4 +9,6 @@ class TutorialKeys {
   static final GlobalKey techniquesTabKey = GlobalKey();
   static final GlobalKey techniquesTabActiveKey = GlobalKey();
   static final GlobalKey addTrainingFabKey = GlobalKey();
+  static final GlobalKey analyticsTabKey = GlobalKey();
+  static final GlobalKey analyticsTabActiveKey = GlobalKey();
 }

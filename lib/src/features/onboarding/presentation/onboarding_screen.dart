@@ -284,10 +284,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           child: const Text('Empezar a Entrenar'),
                         ),
                   const SizedBox(height: 24),
-                  TextButton(
-                    onPressed: () => context.go('/login'),
-                    child: const Text('¿Ya tienes cuenta? Inicia sesión'),
-                  ),
+                  const SizedBox(height: 24),
+                  _buildInlineLogin(context),
                 ],
               ),
             ),
@@ -295,5 +293,84 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildInlineLogin(BuildContext context) {
+    return ExpansionTile(
+      key: const Key('inlineLoginExpansionTile'),
+      title: const Text(
+        '¿Ya tienes cuenta? Inicia sesión',
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        textAlign: TextAlign.center,
+      ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: 'Correo electrónico',
+                  prefixIcon: Icon(Icons.email_outlined),
+                  isDense: true,
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _passwordController,
+                decoration: const InputDecoration(
+                  labelText: 'Contraseña',
+                  prefixIcon: Icon(Icons.lock_outline),
+                  isDense: true,
+                ),
+                obscureText: true,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _login,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF1565C0),
+                  side: const BorderSide(color: Color(0xFF1565C0)),
+                  minimumSize: const Size(double.infinity, 40),
+                ),
+                child: const Text('Entrar'),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  Future<void> _login() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, rellena todos los campos')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await ref.read(authRepositoryProvider).signInWithEmailAndPassword(
+            _emailController.text.trim(),
+            _passwordController.text.trim(),
+          );
+      // Navigation handled by router
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 }

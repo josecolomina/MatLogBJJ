@@ -13,5 +13,31 @@ class TutorialStep {
     this.highlightRect,
     this.actionText,
     this.onAction,
+    this.key,
+    this.fallbackKey,
+    this.padding = 0,
+    this.paddingBottom = 0,
+    this.verticalOffset = 0,
   });
+
+  final GlobalKey? key;
+  final GlobalKey? fallbackKey;
+  final double padding;
+  final double paddingBottom;
+  final double verticalOffset;
+
+  TutorialStep copyWith({Rect? highlightRect}) {
+    return TutorialStep(
+      title: title,
+      description: description,
+      highlightRect: highlightRect ?? this.highlightRect,
+      actionText: actionText,
+      onAction: onAction,
+      key: key,
+      fallbackKey: fallbackKey,
+      padding: padding,
+      paddingBottom: paddingBottom,
+      verticalOffset: verticalOffset,
+    );
+  }
 }

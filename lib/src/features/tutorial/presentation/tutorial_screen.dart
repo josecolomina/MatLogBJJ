@@ -77,45 +77,66 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
       TutorialStep(
         title: 'Registra tus Entrenamientos',
         description: 'Toca el botón + para registrar tu sesión de entrenamiento y las técnicas que practicaste.',
-        highlightRect: _getRectFromKey(TutorialKeys.addTrainingFabKey, padding: 8),
+        key: TutorialKeys.addTrainingFabKey,
+        padding: 8,
       ),
       
       // Step 3: Missions - Navigate back to Home
       TutorialStep(
         title: 'Completa Misiones',
         description: 'Revisa tus objetivos semanales, gana logros y mantén tu motivación alta.',
-        highlightRect: _getRectFromKey(TutorialKeys.missionsKey),
+        key: TutorialKeys.missionsKey,
       ),
       
       // Step 4: Upcoming Classes - Stay on Home
       TutorialStep(
         title: 'Nunca Olvides una Clase',
         description: 'Te recordamos tus próximas sesiones de entrenamiento basadas en tu horario.',
-        highlightRect: _getRectFromKey(TutorialKeys.classesKey),
+        key: TutorialKeys.classesKey,
       ),
       
       // Step 6: Social Tab - Navigate to Social
       TutorialStep(
         title: 'Conecta con Compañeros',
         description: 'Añade a tus compañeros de equipo y registra tus sparrings con ellos.',
-        highlightRect: _getRectFromKey(TutorialKeys.socialTabKey, padding: 24, paddingBottom: 20, verticalOffset: 12, fallbackKey: TutorialKeys.socialTabActiveKey),
+        key: TutorialKeys.socialTabKey,
+        padding: 24,
+        paddingBottom: 20,
+        verticalOffset: 12,
+        fallbackKey: TutorialKeys.socialTabActiveKey,
       ),
       
       // Step 7: Techniques Tab - Navigate to Techniques
       TutorialStep(
         title: 'Domina tu Técnica',
         description: 'Ve tu progreso en cada técnica y sube de cinturón conforme practicas.',
-        highlightRect: _getRectFromKey(TutorialKeys.techniquesTabKey, padding: 24, paddingBottom: 20, verticalOffset: 12, fallbackKey: TutorialKeys.techniquesTabActiveKey),
+        key: TutorialKeys.techniquesTabKey,
+        padding: 24,
+        paddingBottom: 20,
+        verticalOffset: 12,
+        fallbackKey: TutorialKeys.techniquesTabActiveKey,
       ),
       
       // Step 8: Profile - Navigate back to Home to show profile
       TutorialStep(
         title: 'Personaliza tu Perfil',
         description: 'Configura tu cinturón, academia, foto de perfil y horario de entrenamientos.',
-        highlightRect: _getRectFromKey(TutorialKeys.profileKey, padding: 8),
+        key: TutorialKeys.profileKey,
+        padding: 8,
       ),
       
-      // Step 9: Ready to start
+      // Step 9: Analytics - Navigate to Analytics
+      TutorialStep(
+        title: 'Analiza tu Progreso',
+        description: 'Visualiza tus estadísticas de entrenamiento y mejora tu rendimiento.',
+        key: TutorialKeys.analyticsTabKey,
+        padding: 24,
+        paddingBottom: 20,
+        verticalOffset: 12,
+        fallbackKey: TutorialKeys.analyticsTabActiveKey,
+      ),
+      
+      // Step 10: Ready to start
       const TutorialStep(
         title: '¡Listo para Empezar!',
         description: 'Ahora configura tu perfil y comienza tu viaje en el Jiu Jitsu. ¡Oss!',
@@ -166,6 +187,9 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
         case 6: // Step 8: Profile - go to Home to show profile icon (was 7)
           targetTab = 1;
           break;
+        case 7: // Step 9: Analytics - go to Analytics tab
+          targetTab = 3;
+          break;
       }
 
       if (targetTab != null) {
@@ -202,6 +226,20 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   Widget build(BuildContext context) {
     // print('DEBUG TutorialScreen: build called, step: $_currentStepIndex');
     final steps = _getSteps(context);
+    final currentStep = steps[_currentStepIndex];
+    
+    // Resolve rect for current step
+    TutorialStep resolvedStep = currentStep;
+    if (currentStep.key != null) {
+      final rect = _getRectFromKey(
+        currentStep.key!,
+        padding: currentStep.padding,
+        paddingBottom: currentStep.paddingBottom,
+        verticalOffset: currentStep.verticalOffset,
+        fallbackKey: currentStep.fallbackKey,
+      );
+      resolvedStep = currentStep.copyWith(highlightRect: rect);
+    }
     
     return Scaffold(
       body: Stack(
@@ -217,6 +255,8 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
             classesKey: TutorialKeys.classesKey,
             profileKey: TutorialKeys.profileKey,
             addTrainingFabKey: TutorialKeys.addTrainingFabKey,
+            analyticsTabKey: TutorialKeys.analyticsTabKey,
+            analyticsTabActiveKey: TutorialKeys.analyticsTabActiveKey,
           ),
           
           // Tutorial overlay - only show if _showOverlay is true
@@ -226,7 +266,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeInOut,
               child: TutorialOverlay(
-                step: steps[_currentStepIndex],
+                step: resolvedStep,
                 onNext: () => _nextStep(context),
                 currentStep: _currentStepIndex + 1,
                 totalSteps: steps.length,

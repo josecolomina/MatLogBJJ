@@ -10,11 +10,12 @@ class TrainingRepository {
 
   Future<void> addActivity(Activity activity) async {
     try {
-      print('DEBUG: Attempting to add activity: ${activity.activityId}');
+      print('🕵️ SPY: Repository - Attempting to add activity: ${activity.activityId}');
       await _firestore
           .collection('activities')
           .doc(activity.activityId)
           .set(activity.toJson());
+      print('🕵️ SPY: Repository - Activity document created.');
       
       // Update weekly goal progress
       // Ideally this should be a transaction or a cloud function, but for now client-side is fine for MVP
@@ -23,11 +24,12 @@ class TrainingRepository {
         'weekly_goal_progress': FieldValue.increment(1),
         'last_activity_week': _getCurrentWeek(),
       });
+      print('🕵️ SPY: Repository - Weekly goal updated.');
 
-      print('DEBUG: Activity added successfully');
+      print('🕵️ SPY: Repository - Activity added successfully');
     } catch (e, stackTrace) {
-      print('DEBUG: Error adding activity: $e');
-      print('DEBUG: Stack trace: $stackTrace');
+      print('🕵️ SPY: Repository - Error adding activity: $e');
+      print('🕵️ SPY: Stack trace: $stackTrace');
       throw e; // Re-throw to let UI handle it
     }
   }
@@ -40,12 +42,19 @@ class TrainingRepository {
   }
 
   Future<void> addTechnicalLog(String userId, TechnicalLog log) async {
-    await _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('technical_logs')
-        .doc(log.logId)
-        .set(log.toJson());
+    try {
+      print('🕵️ SPY: Repository - Attempting to add technical log: ${log.logId} for user: $userId');
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('technical_logs')
+          .doc(log.logId)
+          .set(log.toJson());
+      print('🕵️ SPY: Repository - Technical log added successfully.');
+    } catch (e) {
+      print('🕵️ SPY: Repository - Error adding technical log: $e');
+      throw e;
+    }
   }
 
   Stream<List<Activity>> getActivities() {
