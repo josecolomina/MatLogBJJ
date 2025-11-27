@@ -5,6 +5,7 @@ import '../domain/tutorial_step.dart';
 import 'tutorial_overlay.dart';
 import '../data/tutorial_repository.dart';
 import '../../dashboard/presentation/main_navigation_screen.dart';
+import 'tutorial_keys.dart';
 
 class TutorialScreen extends ConsumerStatefulWidget {
   const TutorialScreen({super.key});
@@ -17,6 +18,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   int _currentStepIndex = 0;
   late PageController _pageController;
   bool _showOverlay = true; // Control overlay visibility
+  double _overlayOpacity = 1.0; // Control overlay opacity for transitions
 
   @override
   void initState() {
@@ -30,6 +32,34 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
     print('DEBUG TutorialScreen: dispose called');
     _pageController.dispose();
     super.dispose();
+  }
+
+  Rect? _getRectFromKey(GlobalKey key, {double padding = 0, double paddingBottom = 0, double verticalOffset = 0, GlobalKey? fallbackKey}) {
+    RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+    
+    // Try fallback key if main key not found or not ready
+    if ((renderBox == null || !renderBox.hasSize) && fallbackKey != null) {
+      renderBox = fallbackKey.currentContext?.findRenderObject() as RenderBox?;
+    }
+
+    if (renderBox == null || !renderBox.hasSize) {
+      // If we can't find the render box or it's not laid out yet, 
+      // schedule a rebuild for the next frame to try again
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+      return null;
+    }
+    
+    final offset = renderBox.localToGlobal(Offset.zero);
+    return Rect.fromLTWH(
+      offset.dx - padding,
+      offset.dy - padding + verticalOffset,
+      renderBox.size.width + (padding * 2),
+      renderBox.size.height + (padding * 2) + paddingBottom,
+    );
   }
 
   List<TutorialStep> _getSteps(BuildContext context) {
@@ -47,79 +77,42 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
       TutorialStep(
         title: 'Registra tus Entrenamientos',
         description: 'Toca el botón + para registrar tu sesión de entrenamiento y las técnicas que practicaste.',
-        highlightRect: Rect.fromLTWH(
-          MediaQuery.of(context).size.width - 90,
-          MediaQuery.of(context).size.height - 150,
-          70,
-          70,
-        ),
+        highlightRect: _getRectFromKey(TutorialKeys.addTrainingFabKey, padding: 8),
       ),
       
       // Step 3: Missions - Navigate back to Home
       TutorialStep(
         title: 'Completa Misiones',
         description: 'Revisa tus objetivos semanales, gana logros y mantén tu motivación alta.',
-        highlightRect: Rect.fromLTWH(
-          12,
-          140,
-          MediaQuery.of(context).size.width - 24,
-          150,
-        ),
+        highlightRect: _getRectFromKey(TutorialKeys.missionsKey),
       ),
       
       // Step 4: Upcoming Classes - Stay on Home
       TutorialStep(
         title: 'Nunca Olvides una Clase',
         description: 'Te recordamos tus próximas sesiones de entrenamiento basadas en tu horario.',
-        highlightRect: Rect.fromLTWH(
-          12,
-          310,
-          MediaQuery.of(context).size.width - 24,
-          170,
-        ),
-      ),
-      
-      // Step 5: Activity Feed - Stay on Home
-      const TutorialStep(
-        title: 'Sigue tu Progreso',
-        description: 'Ve tu progreso y el de tus compañeros de equipo en tiempo real.',
-        highlightRect: null,
+        highlightRect: _getRectFromKey(TutorialKeys.classesKey),
       ),
       
       // Step 6: Social Tab - Navigate to Social
       TutorialStep(
         title: 'Conecta con Compañeros',
         description: 'Añade a tus compañeros de equipo y registra tus sparrings con ellos.',
-        highlightRect: Rect.fromLTWH(
-          0,
-          MediaQuery.of(context).size.height - 65,
-          MediaQuery.of(context).size.width * 0.33,
-          65,
-        ),
+        highlightRect: _getRectFromKey(TutorialKeys.socialTabKey, padding: 24, paddingBottom: 20, verticalOffset: 12, fallbackKey: TutorialKeys.socialTabActiveKey),
       ),
       
       // Step 7: Techniques Tab - Navigate to Techniques
       TutorialStep(
         title: 'Domina tu Técnica',
         description: 'Ve tu progreso en cada técnica y sube de cinturón conforme practicas.',
-        highlightRect: Rect.fromLTWH(
-          MediaQuery.of(context).size.width * 0.66,
-          MediaQuery.of(context).size.height - 65,
-          MediaQuery.of(context).size.width * 0.34,
-          65,
-        ),
+        highlightRect: _getRectFromKey(TutorialKeys.techniquesTabKey, padding: 24, paddingBottom: 20, verticalOffset: 12, fallbackKey: TutorialKeys.techniquesTabActiveKey),
       ),
       
       // Step 8: Profile - Navigate back to Home to show profile
       TutorialStep(
         title: 'Personaliza tu Perfil',
         description: 'Configura tu cinturón, academia, foto de perfil y horario de entrenamientos.',
-        highlightRect: Rect.fromLTWH(
-          MediaQuery.of(context).size.width - 60,
-          MediaQuery.of(context).padding.top + 5,
-          50,
-          50,
-        ),
+        highlightRect: _getRectFromKey(TutorialKeys.profileKey, padding: 8),
       ),
       
       // Step 9: Ready to start
@@ -140,33 +133,53 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
     );
   }
 
-  void _nextStep(BuildContext context) {
+  void _nextStep(BuildContext context) async {
     final steps = _getSteps(context);
     if (_currentStepIndex < steps.length - 1) {
-      setState(() {
-        _currentStepIndex++;
-      });
       
-      // Navigate to appropriate screen based on step
-      switch (_currentStepIndex) {
+      // Fade out current step
+      if (mounted) {
+        setState(() {
+          _overlayOpacity = 0.0;
+        });
+      }
+      
+      // Wait for fade out
+      await Future.delayed(const Duration(milliseconds: 200));
+
+      // Determine if we need to navigate
+      int? targetTab;
+      switch (_currentStepIndex + 1) { // Check next step index
         case 1: // Step 2: Register trainings (Techniques tab)
-          _navigateToTab(2);
+          targetTab = 2;
           break;
         case 2: // Step 3: Missions (Home tab)
         case 3: // Step 4: Classes (Home tab)
-        case 4: // Step 5: Activity (Home tab)
-          _navigateToTab(1);
+          targetTab = 1;
           break;
-        case 5: // Step 6: Social tab
-          _navigateToTab(0);
+        case 4: // Step 6: Social tab (was 5)
+          targetTab = 0;
           break;
-        case 6: // Step 7: Techniques tab
-          _navigateToTab(2);
+        case 5: // Step 7: Techniques tab (was 6)
+          targetTab = 2;
           break;
-        case 7: // Step 8: Profile - go to Home to show profile icon
-          _navigateToTab(1);
+        case 6: // Step 8: Profile - go to Home to show profile icon (was 7)
+          targetTab = 1;
           break;
-        // Step 9 stay on current tab
+      }
+
+      if (targetTab != null) {
+        _navigateToTab(targetTab);
+        // Wait for animation to complete before showing next step
+        await Future.delayed(const Duration(milliseconds: 350));
+      }
+
+      if (mounted) {
+        setState(() {
+          _currentStepIndex++;
+          // Fade in next step
+          _overlayOpacity = 1.0;
+        });
       }
     } else {
       _completeTutorial();
@@ -176,15 +189,12 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   void _completeTutorial() async {
     await ref.read(tutorialRepositoryProvider).markTutorialCompleted();
     if (mounted) {
-      // Hide overlay instead of navigating
-      setState(() {
-        _showOverlay = false;
+      // Schedule navigation for next frame to avoid layout errors during transition
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.go('/home');
+        }
       });
-      // Navigate after a short delay to let overlay fade
-      await Future.delayed(const Duration(milliseconds: 100));
-      if (mounted) {
-        context.replace('/home');
-      }
     }
   }
 
@@ -197,15 +207,30 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
       body: Stack(
         children: [
           // Real MainNavigationScreen with external PageController
-          MainNavigationScreen(externalPageController: _pageController),
+          MainNavigationScreen(
+            externalPageController: _pageController,
+            socialTabKey: TutorialKeys.socialTabKey,
+            socialTabActiveKey: TutorialKeys.socialTabActiveKey,
+            techniquesTabKey: TutorialKeys.techniquesTabKey,
+            techniquesTabActiveKey: TutorialKeys.techniquesTabActiveKey,
+            missionsKey: TutorialKeys.missionsKey,
+            classesKey: TutorialKeys.classesKey,
+            profileKey: TutorialKeys.profileKey,
+            addTrainingFabKey: TutorialKeys.addTrainingFabKey,
+          ),
           
           // Tutorial overlay - only show if _showOverlay is true
           if (_showOverlay)
-            TutorialOverlay(
-              step: steps[_currentStepIndex],
-              onNext: () => _nextStep(context),
-              currentStep: _currentStepIndex + 1,
-              totalSteps: steps.length,
+            AnimatedOpacity(
+              opacity: _overlayOpacity,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              child: TutorialOverlay(
+                step: steps[_currentStepIndex],
+                onNext: () => _nextStep(context),
+                currentStep: _currentStepIndex + 1,
+                totalSteps: steps.length,
+              ),
             ),
         ],
       ),

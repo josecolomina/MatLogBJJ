@@ -3,13 +3,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../social_rivals/presentation/rivals_screen.dart';
 import 'home_screen.dart';
 import '../../technique_library/presentation/technique_library_screen.dart';
+import '../../tutorial/presentation/tutorial_keys.dart';
 
 class MainNavigationScreen extends ConsumerStatefulWidget {
   final PageController? externalPageController;
+  final GlobalKey? socialTabKey;
+  final GlobalKey? socialTabActiveKey;
+  final GlobalKey? techniquesTabKey;
+  final GlobalKey? techniquesTabActiveKey;
+  final GlobalKey? missionsKey;
+  final GlobalKey? classesKey;
+  final GlobalKey? profileKey;
+  final GlobalKey? addTrainingFabKey;
   
   const MainNavigationScreen({
     super.key,
     this.externalPageController,
+    this.socialTabKey,
+    this.socialTabActiveKey,
+    this.techniquesTabKey,
+    this.techniquesTabActiveKey,
+    this.missionsKey,
+    this.classesKey,
+    this.profileKey,
+    this.addTrainingFabKey,
   });
 
   @override
@@ -25,10 +42,25 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
     super.initState();
     // Use external controller if provided, otherwise create internal one
     _pageController = widget.externalPageController ?? PageController(initialPage: 1);
+    
+    // Listen to page changes to update bottom nav
+    _pageController.addListener(_handlePageChange);
+  }
+
+  void _handlePageChange() {
+    if (_pageController.hasClients && _pageController.page != null) {
+      final page = _pageController.page!.round();
+      if (page != _currentIndex) {
+        setState(() {
+          _currentIndex = page;
+        });
+      }
+    }
   }
 
   @override
   void dispose() {
+    _pageController.removeListener(_handlePageChange);
     // Only dispose if we created the controller internally
     if (widget.externalPageController == null) {
       _pageController.dispose();
@@ -55,11 +87,21 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
     return Scaffold(
       body: PageView(
         controller: _pageController,
-        onPageChanged: _onPageChanged,
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
         children: [
-          RivalsScreen(),
-          HomeScreen(),
-          TechniqueLibraryScreen(),
+          const RivalsScreen(),
+          HomeScreen(
+            missionsKey: widget.missionsKey,
+            classesKey: widget.classesKey,
+            profileKey: widget.profileKey,
+          ),
+          TechniqueLibraryScreen(
+            addTrainingFabKey: widget.addTrainingFabKey,
+          ),
         ],
       ),
       bottomNavigationBar: Container(
@@ -67,33 +109,39 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, -2),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
             ),
           ],
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: _onNavItemTapped,
+          onTap: (index) {
+            _pageController.animateToPage(
+              index,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          },
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
           selectedItemColor: const Color(0xFF1565C0),
-          unselectedItemColor: Colors.grey[600],
-          selectedFontSize: 11,
-          unselectedFontSize: 10,
-          iconSize: 22,
+          unselectedItemColor: Colors.grey,
+          showUnselectedLabels: true,
+          backgroundColor: Colors.white,
           elevation: 0,
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.people),
+              icon: Icon(Icons.people, key: widget.socialTabKey),
+              activeIcon: Icon(Icons.people, key: widget.socialTabActiveKey),
               label: 'Social',
             ),
-            BottomNavigationBarItem(
+            const BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Principal',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.library_books),
+              icon: Icon(Icons.library_books, key: widget.techniquesTabKey),
+              activeIcon: Icon(Icons.library_books, key: widget.techniquesTabActiveKey),
               label: 'Técnicas',
             ),
           ],

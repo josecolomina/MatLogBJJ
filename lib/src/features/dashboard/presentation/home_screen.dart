@@ -14,9 +14,19 @@ import 'dashboard_controller.dart';
 import '../../missions/data/mission_repository.dart';
 import '../../missions/presentation/missions_modal.dart';
 import '../../tutorial/data/tutorial_repository.dart';
+import '../../tutorial/presentation/tutorial_keys.dart';
 
 class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+  final GlobalKey? missionsKey;
+  final GlobalKey? classesKey;
+  final GlobalKey? profileKey;
+
+  const HomeScreen({
+    super.key,
+    this.missionsKey,
+    this.classesKey,
+    this.profileKey,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -69,32 +79,35 @@ class HomeScreen extends ConsumerWidget {
               }
             },
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: ref.watch(userProfileProvider).when(
-                    data: (snapshot) {
-                      final data = snapshot.data() as Map<String, dynamic>?;
-                      final beltMap = data?['belt_info'] as Map<String, dynamic>?;
-                      final beltInfo = beltMap != null ? BeltInfo.fromMap(beltMap) : null;
-                      final photoUrl = data?['photoUrl'] as String?; // Assuming photoUrl field exists or will exist
-
-                      return ProfileImageWidget(
-                        radius: 18,
-                        beltInfo: beltInfo,
-                        photoUrl: photoUrl,
-                      );
-                    },
-                    loading: () => const CircleAvatar(radius: 18, child: CircularProgressIndicator(strokeWidth: 2)),
-                    error: (_, __) => const Icon(Icons.account_circle),
-                  ),
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Container(
+                  key: profileKey,
+                  child: ref.watch(userProfileProvider).when(
+                        data: (snapshot) {
+                          final data = snapshot.data() as Map<String, dynamic>?;
+                          final beltMap = data?['belt_info'] as Map<String, dynamic>?;
+                          final beltInfo = beltMap != null ? BeltInfo.fromMap(beltMap) : null;
+                          final photoUrl = data?['photoUrl'] as String?; // Assuming photoUrl field exists or will exist
+            
+                          return ProfileImageWidget(
+                            radius: 18,
+                            beltInfo: beltInfo,
+                            photoUrl: photoUrl,
+                          );
+                        },
+                        loading: () => const CircleAvatar(radius: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                        error: (_, __) => const Icon(Icons.account_circle),
+                      ),
+                ),
+              ),
             ),
-          ),
         ],
       ),
       body: userProfileAsync.when(
@@ -106,9 +119,9 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const _MissionsCard(),
+                _MissionsCard(missionsKey: missionsKey),
                 const SizedBox(height: 16),
-                const _UpcomingClassesCard(),
+                _UpcomingClassesCard(classesKey: classesKey),
                 const SizedBox(height: 24),
                 Text(
                   AppLocalizations.of(context)!.recentActivity,
@@ -152,7 +165,8 @@ class HomeScreen extends ConsumerWidget {
 }
 
 class _MissionsCard extends ConsumerWidget {
-  const _MissionsCard();
+  final GlobalKey? missionsKey;
+  const _MissionsCard({this.missionsKey});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -166,6 +180,7 @@ class _MissionsCard extends ConsumerWidget {
         final totalCount = missions.length;
 
         return GestureDetector(
+          key: missionsKey,
           onTap: () {
             showModalBottomSheet(
               context: context,
@@ -264,14 +279,25 @@ class _MissionsCard extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const SizedBox.shrink(),
+      loading: () => Card(
+        key: missionsKey,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.all(32.0),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
 }
 
 class _UpcomingClassesCard extends ConsumerWidget {
-  const _UpcomingClassesCard();
+  final GlobalKey? classesKey;
+  const _UpcomingClassesCard({this.classesKey});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -292,6 +318,7 @@ class _UpcomingClassesCard extends ConsumerWidget {
         if (upcoming.isEmpty) return const SizedBox.shrink();
 
         return Card(
+          key: classesKey,
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),

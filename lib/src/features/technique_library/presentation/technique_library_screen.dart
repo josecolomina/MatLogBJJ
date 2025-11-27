@@ -5,9 +5,11 @@ import 'package:go_router/go_router.dart';
 import '../data/technique_repository.dart';
 import '../domain/technique.dart';
 import 'mastery_belt_widget.dart';
+import '../../tutorial/presentation/tutorial_keys.dart';
 
 class TechniqueLibraryScreen extends ConsumerWidget {
-  const TechniqueLibraryScreen({super.key});
+  final GlobalKey? addTrainingFabKey;
+  const TechniqueLibraryScreen({super.key, this.addTrainingFabKey});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -59,6 +61,7 @@ class TechniqueLibraryScreen extends ConsumerWidget {
         error: (err, stack) => Center(child: Text(AppLocalizations.of(context)!.errorLabel(err.toString()))),
       ),
       floatingActionButton: FloatingActionButton(
+        key: addTrainingFabKey,
         onPressed: () => context.push('/check-in'),
         backgroundColor: const Color(0xFF1565C0),
         child: const Icon(Icons.add, color: Colors.white),

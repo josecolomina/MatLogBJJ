@@ -20,7 +20,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     refreshListenable: GoRouterRefreshStream(authRepository.authStateChanges()),
-    redirect: (context, state) {
+    redirect: (context, state) async {
       final user = authRepository.currentUser;
       final isLoggedIn = user != null;
       final location = state.uri.toString();
@@ -28,6 +28,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final isLoggingIn = location == '/login';
       final isOnboarding = location == '/onboarding';
       final isTutorial = location == '/tutorial';
+
+      // Check tutorial status if logged in
+      if (isLoggedIn) {
+        final tutorialCompleted = await ref.read(tutorialRepositoryProvider).isTutorialCompleted();
+        
+        // If tutorial not completed and not already there, go to tutorial
+        if (!tutorialCompleted && !isTutorial) {
+          return '/tutorial';
+        }
+
+        // If logged in and trying to access login/onboarding, redirect to home
+        if (isLoggingIn || isOnboarding) {
+          return '/home';
+        }
+      }
 
       // Redirect from root
       if (isOnRoot) {
@@ -37,12 +52,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // If not logged in and not on login/onboarding/tutorial pages, redirect to onboarding
       if (!isLoggedIn && !isLoggingIn && !isOnboarding && !isTutorial) {
         return '/onboarding';
-      }
-
-      // If logged in and trying to access login/onboarding, redirect to home
-      // BUT allow tutorial even when logged in (for first-time setup)
-      if (isLoggedIn && (isLoggingIn || isOnboarding)) {
-        return '/home';
       }
 
       return null;
@@ -61,7 +70,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/home',
-        builder: (context, state) => const MainNavigationScreen(),
+        pageBuilder: (context, state) => NoTransitionPage(
+          key: state.pageKey,
+          child: const MainNavigationScreen(),
+        ),
       ),
       GoRoute(
         path: '/login',

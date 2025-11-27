@@ -11,20 +11,26 @@ class MissionsModal extends ConsumerStatefulWidget {
 }
 
 class _MissionsModalState extends ConsumerState<MissionsModal> {
+  MissionRepository? _missionRepository;
+  List<String> _missionIds = [];
+
   @override
   void dispose() {
     // Mark all missions as viewed when modal closes
-    final missionsAsync = ref.read(missionsStreamProvider);
-    missionsAsync.whenData((missions) {
-      final missionIds = missions.map((m) => m.id).toList();
-      ref.read(missionRepositoryProvider).markMissionsAsViewed(missionIds);
-    });
+    if (_missionRepository != null && _missionIds.isNotEmpty) {
+      _missionRepository!.markMissionsAsViewed(_missionIds);
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final missionsAsync = ref.watch(missionsStreamProvider);
+    _missionRepository = ref.watch(missionRepositoryProvider);
+    
+    missionsAsync.whenData((missions) {
+      _missionIds = missions.map((m) => m.id).toList();
+    });
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
