@@ -24,12 +24,12 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 1);
-    print('DEBUG TutorialScreen: initState called');
+    // print('DEBUG TutorialScreen: initState called');
   }
 
   @override
   void dispose() {
-    print('DEBUG TutorialScreen: dispose called');
+    // print('DEBUG TutorialScreen: dispose called');
     _pageController.dispose();
     super.dispose();
   }
@@ -63,7 +63,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
   }
 
   List<TutorialStep> _getSteps(BuildContext context) {
-    print('DEBUG TutorialScreen: _getSteps called');
+    // print('DEBUG TutorialScreen: _getSteps called');
     return [
       // Step 1: Welcome
       const TutorialStep(
@@ -200,7 +200,7 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('DEBUG TutorialScreen: build called, step: $_currentStepIndex');
+    // print('DEBUG TutorialScreen: build called, step: $_currentStepIndex');
     final steps = _getSteps(context);
     
     return Scaffold(

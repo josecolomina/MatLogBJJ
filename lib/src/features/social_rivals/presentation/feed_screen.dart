@@ -66,7 +66,7 @@ class FeedScreen extends ConsumerWidget {
                   ),
                 ),
                 title: Text(
-                  '${activity.userName} entrenó ${activity.type[0].toUpperCase()}${activity.type.substring(1).toLowerCase()}',
+                  'Entrenamiento ${activity.type[0].toUpperCase()}${activity.type.substring(1).toLowerCase()}',
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Padding(

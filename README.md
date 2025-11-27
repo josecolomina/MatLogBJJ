@@ -39,6 +39,9 @@ La app está diseñada para el flujo de vida de un luchador:
 1.  **Check-In Rápido:** Al llegar al tatami, registra tu asistencia con un par de toques.
 2.  **Modo Diario:** Al terminar, dicta tus notas o escribe rápidamente los detalles técnicos.
 3.  **Comunidad:** Revisa el feed para ver quién más ha entrenado hoy y mantén viva la competencia sana.
+4.  **Analytics & Progreso:** Visualiza tu evolución con gráficos avanzados:
+    *   **Estilo de Juego (Radar Chart):** Un gráfico que define tu identidad como luchador (Guardero, Pasador, etc.) basándose en el análisis de IA de tus notas técnicas.
+    *   **Consistencia Semanal (Bar Chart):** Monitoriza tu disciplina y detecta patrones en tu rutina de entrenamiento para mejorar tu constancia.
 
 ## 🏁 Ejecutar en tu Móvil (o Simulador)
 

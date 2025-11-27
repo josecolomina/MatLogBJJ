@@ -57,9 +57,10 @@ void main() {
 
     expect(find.text('Armbar'), findsOneWidget);
     expect(find.text('Kimura'), findsOneWidget);
-    expect(find.text('Guard • Submission'), findsOneWidget);
-    expect(find.text('20 Repetitions'), findsOneWidget);
-    expect(find.text('5 Repetitions'), findsOneWidget);
+    expect(find.text('Guard'), findsOneWidget);
+    expect(find.text('Side Control'), findsOneWidget);
+    expect(find.text('20 reps'), findsOneWidget);
+    expect(find.text('5 reps'), findsOneWidget);
   });
 
   testWidgets('TechniqueLibraryScreen displays empty state', (WidgetTester tester) async {

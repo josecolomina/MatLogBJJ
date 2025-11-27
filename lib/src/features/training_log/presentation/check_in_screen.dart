@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:matlog/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,10 @@ import '../domain/technical_log.dart';
 import '../../../services/gemini_service.dart';
 import '../../technique_library/domain/technique_extraction_service.dart';
 import '../../technique_library/presentation/level_up_dialog.dart';
+
+// ... (existing imports)
+
+
 
 class CheckInScreen extends ConsumerStatefulWidget {
   const CheckInScreen({super.key});
@@ -104,6 +109,7 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
           if (mounted && leveledUpTechniques.isNotEmpty) {
              // Show level up dialogs sequentially or just the first one for now
              for (final technique in leveledUpTechniques) {
+               HapticFeedback.mediumImpact(); // Haptic feedback for level up
                await showDialog(
                  context: context,
                  builder: (context) => LevelUpDialog(technique: technique),
@@ -113,6 +119,7 @@ class _CheckInScreenState extends ConsumerState<CheckInScreen> {
         }
 
         if (mounted) {
+          HapticFeedback.mediumImpact(); // Haptic feedback for training logged
           context.pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(AppLocalizations.of(context)!.trainingLogged)),

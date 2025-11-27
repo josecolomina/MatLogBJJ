@@ -51,7 +51,7 @@ class TrainingRepository {
   Stream<List<Activity>> getActivities() {
     return _firestore
         .collection('activities')
-        .orderBy('timestamp_start', descending: true)
+        .orderBy('timestampStart', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((doc) => Activity.fromJson(doc.data()))
@@ -74,4 +74,9 @@ final firestoreProvider = Provider<FirebaseFirestore>((ref) {
 
 final trainingRepositoryProvider = Provider<TrainingRepository>((ref) {
   return TrainingRepository(ref.watch(firestoreProvider));
+});
+
+final userActivitiesProvider = StreamProvider<List<Activity>>((ref) {
+  final repository = ref.watch(trainingRepositoryProvider);
+  return repository.getActivities();
 });

@@ -205,4 +205,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rpeLabel => 'RPE (Intensity)';
+
+  @override
+  String get beltWhite => 'White Belt';
+
+  @override
+  String get beltBlue => 'Blue Belt';
+
+  @override
+  String get beltPurple => 'Purple Belt';
+
+  @override
+  String get beltBrown => 'Brown Belt';
+
+  @override
+  String get beltBlack => 'Black Belt';
+
+  @override
+  String get analyticsTitle => 'Analytics & Progress';
+
+  @override
+  String get gameStyleTitle => 'Game Style';
+
+  @override
+  String get gameStyleExplanation =>
+      'This chart shows your technical profile based on the techniques you practice. The larger the area in each category, the more techniques you master in that style.';
+
+  @override
+  String get trainingDistributionTitle => 'Training Distribution';
+
+  @override
+  String get trainingDistributionExplanation =>
+      'Shows what percentage of your training is with Gi vs NoGi. Helps you see if you are balanced or focusing more on one modality.';
+
+  @override
+  String get matTimeTitle => 'Mat Time';
+
+  @override
+  String get matTimeExplanation =>
+      'This chart shows your accumulated training hours over time. The line always goes up, representing your total effort on the mat.';
+
+  @override
+  String get intensityTitle => 'Intensity (RPE)';
+
+  @override
+  String get intensityExplanation =>
+      'Each point represents the intensity of a training session (RPE from 1 to 10). Green = light session, Orange = moderate, Red = very intense. Helps you avoid overtraining.';
+
+  @override
+  String get topPositionsTitle => 'Technique Categories';
+
+  @override
+  String get topPositionsExplanation =>
+      'Shows the categories where you have the most techniques registered (Guard, Passing, Submission, Defense, Takedowns). Defines which areas you focus on most.';
+
+  @override
+  String get weeklyConsistencyTitle => 'Weekly Consistency';
+
+  @override
+  String get weeklyConsistencyExplanation =>
+      'Shows which days of the week you train most frequently. Helps you identify your training routine.';
 }

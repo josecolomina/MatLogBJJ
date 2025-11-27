@@ -27,31 +27,54 @@ class TechniqueLibraryScreen extends ConsumerWidget {
             );
           }
           
-          // Group by position or category? Let's just list them for now.
+          // Group techniques by category
+          final groupedTechniques = <String, List<Technique>>{};
+          for (var technique in techniques) {
+            final category = technique.category.isEmpty ? 'Otros' : technique.category;
+            if (!groupedTechniques.containsKey(category)) {
+              groupedTechniques[category] = [];
+            }
+            groupedTechniques[category]!.add(technique);
+          }
+          
+          final sortedCategories = groupedTechniques.keys.toList()..sort();
+
           return ListView.builder(
-            itemCount: techniques.length,
+            itemCount: sortedCategories.length,
             itemBuilder: (context, index) {
-              final technique = techniques[index];
+              final category = sortedCategories[index];
+              final categoryTechniques = groupedTechniques[category]!;
+
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ListTile(
-                  title: Text(technique.name),
-                  subtitle: Text('${technique.position} • ${technique.category}'),
-                  trailing: SizedBox(
-                    width: 100,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        MasteryBeltWidget(belt: technique.masteryBelt, height: 16, showLabel: false),
-                        const SizedBox(height: 4),
-                        Text('${technique.totalRepetitions} ${AppLocalizations.of(context)!.repetitionsLabel}', style: Theme.of(context).textTheme.bodySmall),
-                      ],
-                    ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 2,
+                child: ExpansionTile(
+                  shape: const Border(),
+                  collapsedShape: const Border(),
+                  title: Text(
+                    category,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF1565C0)),
                   ),
-                  onTap: () {
-                    // Navigate to detail
-                    context.push('/techniques/${technique.id}');
-                  },
+                  initiallyExpanded: true,
+                  children: categoryTechniques.map((technique) {
+                    return ListTile(
+                      title: Text(technique.name, style: const TextStyle(fontWeight: FontWeight.w500)),
+                      subtitle: Text(technique.position),
+                      trailing: SizedBox(
+                        width: 100,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            MasteryBeltWidget(belt: technique.masteryBelt, height: 12, showLabel: false),
+                            const SizedBox(height: 4),
+                            Text('${technique.totalRepetitions} reps', style: Theme.of(context).textTheme.bodySmall),
+                          ],
+                        ),
+                      ),
+                      onTap: () => context.push('/techniques/${technique.id}'),
+                    );
+                  }).toList(),
                 ),
               );
             },

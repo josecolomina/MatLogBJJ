@@ -112,8 +112,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.shield_outlined, size: 80, color: Color(0xFF1565C0)),
-                  const SizedBox(height: 24),
+                  Image.asset(
+                    'assets/images/logo_simple.png',
+                    height: 150,
+                  ),
+                  const SizedBox(height: 4),
                   Text(
                     'Bienvenido a MatLog',
                     textAlign: TextAlign.center,
@@ -166,7 +169,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           value: _selectedBelt,
                           decoration: const InputDecoration(
                             labelText: 'Cinturón',
-                            prefixIcon: Icon(Icons.military_tech),
+                            prefixIcon: Icon(Icons.stars),
                           ),
                           items: BeltColor.values.map((belt) {
                             return DropdownMenuItem(

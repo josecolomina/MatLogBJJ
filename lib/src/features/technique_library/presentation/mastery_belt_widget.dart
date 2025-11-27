@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:matlog/l10n/app_localizations.dart';
 import '../domain/mastery_belt.dart';
 
 class MasteryBeltWidget extends StatelessWidget {
@@ -33,11 +34,26 @@ class MasteryBeltWidget extends StatelessWidget {
     return Colors.white;
   }
 
+  String _getLocalizedBeltName(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (belt) {
+      case MasteryBelt.white:
+        return l10n.beltWhite;
+      case MasteryBelt.blue:
+        return l10n.beltBlue;
+      case MasteryBelt.purple:
+        return l10n.beltPurple;
+      case MasteryBelt.brown:
+        return l10n.beltBrown;
+      case MasteryBelt.black:
+        return l10n.beltBlack;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       height: height,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: _beltColor,
         borderRadius: BorderRadius.circular(4),
@@ -50,17 +66,33 @@ class MasteryBeltWidget extends StatelessWidget {
           ),
         ],
       ),
-      child: Center(
-        child: showLabel
-            ? Text(
-                belt.displayName.toUpperCase(),
-                style: TextStyle(
-                  color: _textColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: height * 0.5,
-                ),
-              )
-            : null,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Expanded(
+            child: Center(
+              child: showLabel
+                  ? Text(
+                      _getLocalizedBeltName(context).toUpperCase(),
+                      style: TextStyle(
+                        color: _textColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: height * 0.5,
+                      ),
+                    )
+                  : null,
+            ),
+          ),
+          // Rank Bar
+          Container(
+            width: height * 1.5, // Proportional width
+            margin: const EdgeInsets.only(right: 4, top: 2, bottom: 2),
+            decoration: BoxDecoration(
+              color: belt == MasteryBelt.black ? Colors.red : Colors.black,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ],
       ),
     );
   }

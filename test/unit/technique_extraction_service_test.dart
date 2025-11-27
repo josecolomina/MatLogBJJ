@@ -63,7 +63,7 @@ void main() {
       verify(mockRepository.incrementRepetitions(
         name: 'Armbar',
         position: 'Guard',
-        category: 'Submission',
+        category: 'Sumisión',  // Normalized from 'Submission'
         amount: 1,
       )).called(1);
     });
@@ -108,7 +108,7 @@ void main() {
       verify(mockRepository.incrementRepetitions(
         name: 'Armbar',
         position: 'Guard',
-        category: 'Submission',
+        category: 'Sumisión',  // Normalized from 'Submission'
         amount: 2,
       )).called(1);
     });

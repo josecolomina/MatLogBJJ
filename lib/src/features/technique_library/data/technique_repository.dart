@@ -95,3 +95,8 @@ final techniqueRepositoryProvider = Provider<TechniqueRepository>((ref) {
   }
   return FirestoreTechniqueRepository(FirebaseFirestore.instance, user.uid);
 });
+
+final userTechniquesProvider = StreamProvider<List<Technique>>((ref) {
+  final repository = ref.watch(techniqueRepositoryProvider);
+  return repository.watchTechniques();
+});

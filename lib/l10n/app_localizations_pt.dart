@@ -205,4 +205,64 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get rpeLabel => 'RPE (Intensidade)';
+
+  @override
+  String get beltWhite => 'Faixa Branca';
+
+  @override
+  String get beltBlue => 'Faixa Azul';
+
+  @override
+  String get beltPurple => 'Faixa Roxa';
+
+  @override
+  String get beltBrown => 'Faixa Marrom';
+
+  @override
+  String get beltBlack => 'Faixa Preta';
+
+  @override
+  String get analyticsTitle => 'Analytics & Progresso';
+
+  @override
+  String get gameStyleTitle => 'Estilo de Jogo';
+
+  @override
+  String get gameStyleExplanation =>
+      'Este gráfico mostra seu perfil técnico baseado nas técnicas que você pratica. Quanto maior a área em cada categoria, mais técnicas você domina naquele estilo.';
+
+  @override
+  String get trainingDistributionTitle => 'Distribuição de Treino';
+
+  @override
+  String get trainingDistributionExplanation =>
+      'Mostra que porcentagem do seu treino é com Kimono (Gi) vs Sem Kimono (NoGi). Ajuda você a ver se está equilibrado ou se foca mais em uma modalidade.';
+
+  @override
+  String get matTimeTitle => 'Tempo no Tatame';
+
+  @override
+  String get matTimeExplanation =>
+      'Este gráfico mostra suas horas acumuladas de treinamento ao longo do tempo. A linha sempre sobe, representando seu esforço total no tatame.';
+
+  @override
+  String get intensityTitle => 'Intensidade (RPE)';
+
+  @override
+  String get intensityExplanation =>
+      'Cada ponto representa a intensidade de uma sessão de treino (RPE de 1 a 10). Verde = sessão leve, Laranja = moderada, Vermelho = muito intensa. Ajuda você a evitar o overtraining.';
+
+  @override
+  String get topPositionsTitle => 'Categorias de Técnicas';
+
+  @override
+  String get topPositionsExplanation =>
+      'Mostra as categorias onde você tem mais técnicas registradas (Guarda, Passagem, Finalização, Defesa, Quedas). Define em quais áreas você foca mais.';
+
+  @override
+  String get weeklyConsistencyTitle => 'Consistência Semanal';
+
+  @override
+  String get weeklyConsistencyExplanation =>
+      'Mostra quais dias da semana você treina com mais frequência. Ajuda você a identificar sua rotina de treino.';
 }

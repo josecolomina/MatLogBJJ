@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui' as ui;
 
 class SpotlightPainter extends CustomPainter {
   final Rect? spotlight;

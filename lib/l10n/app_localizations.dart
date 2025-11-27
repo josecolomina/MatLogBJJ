@@ -477,6 +477,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'RPE (Intensity)'**
   String get rpeLabel;
+
+  /// No description provided for @beltWhite.
+  ///
+  /// In en, this message translates to:
+  /// **'White Belt'**
+  String get beltWhite;
+
+  /// No description provided for @beltBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Belt'**
+  String get beltBlue;
+
+  /// No description provided for @beltPurple.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple Belt'**
+  String get beltPurple;
+
+  /// No description provided for @beltBrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown Belt'**
+  String get beltBrown;
+
+  /// No description provided for @beltBlack.
+  ///
+  /// In en, this message translates to:
+  /// **'Black Belt'**
+  String get beltBlack;
+
+  /// No description provided for @analyticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics & Progress'**
+  String get analyticsTitle;
+
+  /// No description provided for @gameStyleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Style'**
+  String get gameStyleTitle;
+
+  /// No description provided for @gameStyleExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'This chart shows your technical profile based on the techniques you practice. The larger the area in each category, the more techniques you master in that style.'**
+  String get gameStyleExplanation;
+
+  /// No description provided for @trainingDistributionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Training Distribution'**
+  String get trainingDistributionTitle;
+
+  /// No description provided for @trainingDistributionExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Shows what percentage of your training is with Gi vs NoGi. Helps you see if you are balanced or focusing more on one modality.'**
+  String get trainingDistributionExplanation;
+
+  /// No description provided for @matTimeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mat Time'**
+  String get matTimeTitle;
+
+  /// No description provided for @matTimeExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'This chart shows your accumulated training hours over time. The line always goes up, representing your total effort on the mat.'**
+  String get matTimeExplanation;
+
+  /// No description provided for @intensityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity (RPE)'**
+  String get intensityTitle;
+
+  /// No description provided for @intensityExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Each point represents the intensity of a training session (RPE from 1 to 10). Green = light session, Orange = moderate, Red = very intense. Helps you avoid overtraining.'**
+  String get intensityExplanation;
+
+  /// No description provided for @topPositionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Technique Categories'**
+  String get topPositionsTitle;
+
+  /// No description provided for @topPositionsExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Shows the categories where you have the most techniques registered (Guard, Passing, Submission, Defense, Takedowns). Defines which areas you focus on most.'**
+  String get topPositionsExplanation;
+
+  /// No description provided for @weeklyConsistencyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Consistency'**
+  String get weeklyConsistencyTitle;
+
+  /// No description provided for @weeklyConsistencyExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Shows which days of the week you train most frequently. Helps you identify your training routine.'**
+  String get weeklyConsistencyExplanation;
 }
 
 class _AppLocalizationsDelegate

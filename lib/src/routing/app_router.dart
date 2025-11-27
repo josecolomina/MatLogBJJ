@@ -8,8 +8,6 @@ import '../features/authentication/presentation/register_screen.dart';
 import '../features/dashboard/presentation/main_navigation_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/training_log/presentation/check_in_screen.dart';
-import '../features/social_rivals/presentation/rivals_screen.dart';
-import '../features/technique_library/presentation/technique_library_screen.dart';
 import '../features/technique_library/presentation/technique_detail_screen.dart';
 import '../features/tutorial/presentation/tutorial_screen.dart';
 import '../features/tutorial/data/tutorial_repository.dart';

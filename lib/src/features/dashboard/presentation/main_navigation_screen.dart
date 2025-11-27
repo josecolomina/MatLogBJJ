@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../social_rivals/presentation/rivals_screen.dart';
 import 'home_screen.dart';
 import '../../technique_library/presentation/technique_library_screen.dart';
 import '../../tutorial/presentation/tutorial_keys.dart';
+import '../../analytics/presentation/analytics_screen.dart';
 
 class MainNavigationScreen extends ConsumerStatefulWidget {
   final PageController? externalPageController;
@@ -102,6 +104,7 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
           TechniqueLibraryScreen(
             addTrainingFabKey: widget.addTrainingFabKey,
           ),
+          const AnalyticsScreen(),
         ],
       ),
       bottomNavigationBar: Container(
@@ -116,13 +119,7 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (index) {
-            _pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          },
+          onTap: _onNavItemTapped,
           type: BottomNavigationBarType.fixed,
           selectedItemColor: const Color(0xFF1565C0),
           unselectedItemColor: Colors.grey,
@@ -143,6 +140,10 @@ class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
               icon: Icon(Icons.library_books, key: widget.techniquesTabKey),
               activeIcon: Icon(Icons.library_books, key: widget.techniquesTabActiveKey),
               label: 'Técnicas',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.insights),
+              label: 'Progreso',
             ),
           ],
         ),
